@@ -1,1 +1,1 @@
-# OGS-SimX-Interface
+# OGS-Modelica-Interface
