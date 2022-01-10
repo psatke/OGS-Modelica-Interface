@@ -1,0 +1,51 @@
+info: This is OpenGeoSys-6 version 6.4.0-992-gc24930888.dirty.
+info: OGS started on 2021-09-21 10:55:23+0200.
+warning: Consider switching from mesh and geometry input to multiple meshes input. See https://www.opengeosys.org/docs/tools/meshing-submeshes/constructmeshesfromgeometry/ tool for conversion.
+info: ConstantParameter: T0
+info: ConstantParameter: T0_BHE1
+info: No source terms for process variable 'temperature_soil' found.
+info: No boundary conditions for process variable 'temperature_BHE1' found.
+info: No source terms for process variable 'temperature_BHE1' found.
+warning: The maximum value of MaterialIDs in mesh is 1. As the given number of porous media definitions in the project file is 1, the maximum value of MaterialIDs in mesh must be 0 (index starts with zero).
+info: Initialize processes.
+info: Solve processes.
+info: [time] Output of timestep 0 took 0.0530992 s.
+info: === Time stepping at step #1 and time 60 with step size 60
+info: Calculate non-equilibrium initial residuum.
+info: [time] Assembly took 0.227765 s.
+info: [time] Applying Dirichlet BCs took 0.0065365 s.
+info: ------------------------------------------------------------------
+info: *** Eigen solver computation
+info: -> solve with BiCGSTAB (precon ILUT)
+info: 	 iteration: 2/1000
+info: 	 residual: 3.169967e-23
+
+info: ------------------------------------------------------------------
+info: [time] Linear solver took 0.376137 s.
+info: Convergence criterion: |dx|=1.2231e+00, |x|=2.4064e+04, |dx|/|x|=5.0829e-05
+info: [time] Iteration #1 took 0.610893 s.
+info: [time] Assembly took 0.164905 s.
+info: [time] Applying Dirichlet BCs took 0.0016341 s.
+info: ------------------------------------------------------------------
+info: *** Eigen solver computation
+info: -> solve with BiCGSTAB (precon ILUT)
+info: 	 iteration: 2/1000
+info: 	 residual: 1.300835e-24
+
+info: ------------------------------------------------------------------
+info: [time] Linear solver took 0.336438 s.
+info: Convergence criterion: |dx|=3.6331e-02, |x|=2.4064e+04, |dx|/|x|=1.5098e-06
+info: [time] Iteration #2 took 0.503058 s.
+info: [time] Assembly took 0.160916 s.
+info: [time] Applying Dirichlet BCs took 0.0016688 s.
+info: ------------------------------------------------------------------
+info: *** Eigen solver computation
+info: -> solve with BiCGSTAB (precon ILUT)
+info: 	 iteration: 1/1000
+info: 	 residual: 9.231665e-22
+
+info: ------------------------------------------------------------------
+info: [time] Linear solver took 0.309646 s.
+info: Convergence criterion: |dx|=5.7914e-08, |x|=2.4064e+04, |dx|/|x|=2.4067e-12
+info: [time] Iteration #3 took 0.47231 s.
+info: [time] Solving process #0 took 1.58664 s in time step #1 
