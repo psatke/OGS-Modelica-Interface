@@ -1,1 +1,1 @@
-ogs.exe beier_sandbox.prj > result.tec &
+ogs.exe -o results beier_sandbox.prj > result.tec &
