@@ -151,13 +151,16 @@ simXThread = threading.Thread(target=startSimulationX, kwargs={'xl_id': xl_id})
 simXThread.start()
 
 # start OGS
-callOGS = dir + r'\OGS-Model' + r'\ogs.exe ' + \
-    dir + r'\OGS-Model' + r'\{}.prj'.format(OGS_project)
-# subprocess.call(callOGS, cwd=dir) # run OGS with Output
+callOGS = r'{}\OGS-Model\ogs.exe -o {}\OGS-Model\results {}\OGS-Model\{}.prj > {}\OGS-Model\results\result.tec'.format(
+    dir, dir, dir, OGS_project, dir)
+
+# subprocess.run(callOGS, shell=True)  # run OGS with Output
+print(callOGS)
 print('[OGS] running ...')
-with open('out.txt', 'w+') as fout:
-    with open('err.txt', 'w+') as ferr:
-        out = subprocess.call(callOGS, cwd=dir, stdout=fout, stderr=ferr)
+with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
+    with open(r'{}\OGS-Model\results\err.txt'.format(dir), 'w+') as ferr:
+        out = subprocess.call(
+            callOGS, cwd=dir, stdout=fout, stderr=ferr, shell=True)
         fout.seek(0)
         output = fout.read()
         ferr.seek(0)

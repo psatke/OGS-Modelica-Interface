@@ -1,1 +1,0 @@
-ogs.exe -o results beier_sandbox.prj > result.tec &
