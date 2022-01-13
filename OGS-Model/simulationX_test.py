@@ -20,7 +20,7 @@ class BC(OpenGeoSys.BHENetwork):
     def initializeDataContainer(self):
         # initialize network and get data from the network
         # (initial time, Tin, Tout, Tout_node_id, flowrate)
-        return (0, [273.15], [273.15], [0], [2.0E-04])
+        return (0, [295.15], [295.15], [0], [2.0E-04])
 
     def serverCommunication(self, t, dt, Tin_val, Tout_val, flowrate):
         # TODO: Code for SimualtionX simulation

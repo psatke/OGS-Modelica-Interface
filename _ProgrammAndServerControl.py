@@ -31,7 +31,7 @@ df_OGS = pd.DataFrame(columns=['Paket Code', 't', 'dt', 'n',
                                'kanal1(t)', 'kanal1(t-dt)', 'kanal2(t)', 'kanal2(t-dt)'])
 # OGS will conntect after the first calculationstep. The initialization is added manually.
 df_OGS = df_OGS.append({'Paket Code': 26, 't': 0.0, 'dt': 60.0, 'n': 2, 'kanal1(t)': 0.0002,
-                        'kanal1(t-dt)': 0.0002, 'kanal2(t)': 295.36, 'kanal2(t-dt)': 295.36}, ignore_index=True)
+                        'kanal1(t-dt)': 0.0002, 'kanal2(t)': 295.15, 'kanal2(t-dt)': 295.15}, ignore_index=True)
 
 stepsSimX = 0
 stepsOGS = 1
@@ -154,8 +154,7 @@ simXThread.start()
 callOGS = r'{}\OGS-Model\ogs.exe -o {}\OGS-Model\results {}\OGS-Model\{}.prj > {}\OGS-Model\results\result.tec'.format(
     dir, dir, dir, OGS_project, dir)
 
-# subprocess.run(callOGS, shell=True)  # run OGS with Output
-print(callOGS)
+# subprocess.run(callOGS, shell=True)  # run OGS with Output in terminal
 print('[OGS] running ...')
 with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
     with open(r'{}\OGS-Model\results\err.txt'.format(dir), 'w+') as ferr:
