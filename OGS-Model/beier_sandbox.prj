@@ -2,7 +2,7 @@
 <OpenGeoSysProject>
     <mesh>beier_sandbox.vtu</mesh>
     <geometry>beier_sandbox.gml</geometry>
-    <!-- <python_script>simulationX_test.py</python_script> -->
+    <python_script>simulationX_test.py</python_script>
     <processes>
         <process>
             <name>HeatTransportBHE</name>
@@ -12,7 +12,7 @@
                 <process_variable>temperature_soil</process_variable>
                 <process_variable>temperature_BHE1</process_variable>
             </process_variables>
-            <!-- <use_server_communication>true</use_server_communication> -->
+            <use_server_communication>true</use_server_communication>
             <borehole_heat_exchangers>
                 <borehole_heat_exchanger>
                     <type>1U</type>
