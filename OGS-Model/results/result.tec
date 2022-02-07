@@ -1,5 +1,5 @@
 info: This is OpenGeoSys-6 version 6.4.0-992-gc24930888.dirty.
-info: OGS started on 2022-02-07 15:36:00+0100.
+info: OGS started on 2022-02-07 15:55:04+0100.
 warning: Consider switching from mesh and geometry input to multiple meshes input. See https://www.opengeosys.org/docs/tools/meshing-submeshes/constructmeshesfromgeometry/ tool for conversion.
 info: ConstantParameter: T0
 info: ConstantParameter: T0_BHE1
@@ -9,11 +9,11 @@ info: No source terms for process variable 'temperature_BHE1' found.
 warning: The maximum value of MaterialIDs in mesh is 1. As the given number of porous media definitions in the project file is 1, the maximum value of MaterialIDs in mesh must be 0 (index starts with zero).
 info: Initialize processes.
 info: Solve processes.
-info: [time] Output of timestep 0 took 0.0352452 s.
+info: [time] Output of timestep 0 took 0.0332507 s.
 info: === Time stepping at step #1 and time 60 with step size 60
 info: Calculate non-equilibrium initial residuum.
-info: [time] Assembly took 0.202335 s.
-info: [time] Applying Dirichlet BCs took 0.0020722 s.
+info: [time] Assembly took 0.236142 s.
+info: [time] Applying Dirichlet BCs took 0.0020494 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -21,15 +21,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 4.188158e-25
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.400705 s.
+info: [time] Linear solver took 0.467862 s.
 info: Convergence criterion: |dx|=1.8639e-11, |x|=2.4062e+04, |dx|/|x|=7.7464e-16
-info: [time] Iteration #1 took 0.605209 s.
-info: [time] Solving process #0 took 0.605509 s in time step #1 
-info: [time] Time step #1 took 0.620713 s.
-info: [time] Output of timestep 1 took 0.0315432 s.
+info: [time] Iteration #1 took 0.706235 s.
+info: [time] Solving process #0 took 0.706819 s in time step #1 
+info: [time] Time step #1 took 0.738876 s.
+info: [time] Output of timestep 1 took 0.0589587 s.
 info: === Time stepping at step #2 and time 120 with step size 60
-info: [time] Assembly took 0.182569 s.
-info: [time] Applying Dirichlet BCs took 0.0020038 s.
+info: [time] Assembly took 0.238359 s.
+info: [time] Applying Dirichlet BCs took 0.0294915 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -37,11 +37,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.049880e-21
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.37136 s.
+info: [time] Linear solver took 0.448749 s.
 info: Convergence criterion: |dx|=7.9886e+01, |x|=2.4056e+04, |dx|/|x|=3.3209e-03
-info: [time] Iteration #1 took 0.556048 s.
-info: [time] Assembly took 0.198985 s.
-info: [time] Applying Dirichlet BCs took 0.0028601 s.
+info: [time] Iteration #1 took 0.716849 s.
+info: [time] Assembly took 0.252941 s.
+info: [time] Applying Dirichlet BCs took 0.0042936 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -49,11 +49,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 5.175499e-21
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.385548 s.
+info: [time] Linear solver took 0.468741 s.
 info: Convergence criterion: |dx|=6.0404e+01, |x|=2.4051e+04, |dx|/|x|=2.5115e-03
-info: [time] Iteration #2 took 0.587557 s.
-info: [time] Assembly took 0.234138 s.
-info: [time] Applying Dirichlet BCs took 0.001795 s.
+info: [time] Iteration #2 took 0.726183 s.
+info: [time] Assembly took 0.291376 s.
+info: [time] Applying Dirichlet BCs took 0.0025488 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -61,11 +61,11 @@ info: 	 iteration: 1/1000
 info: 	 residual: 1.535196e-18
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.366786 s.
+info: [time] Linear solver took 0.486089 s.
 info: Convergence criterion: |dx|=9.6294e-05, |x|=2.4051e+04, |dx|/|x|=4.0037e-09
-info: [time] Iteration #3 took 0.602797 s.
-info: [time] Assembly took 0.175981 s.
-info: [time] Applying Dirichlet BCs took 0.0021174 s.
+info: [time] Iteration #3 took 0.780161 s.
+info: [time] Assembly took 0.2355 s.
+info: [time] Applying Dirichlet BCs took 0.0035168 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -73,15 +73,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 2.601149e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.350323 s.
+info: [time] Linear solver took 0.506538 s.
 info: Convergence criterion: |dx|=1.5524e-10, |x|=2.4051e+04, |dx|/|x|=6.4545e-15
-info: [time] Iteration #4 took 0.5285 s.
-info: [time] Solving process #0 took 2.27513 s in time step #2 
-info: [time] Time step #2 took 2.28706 s.
-info: [time] Output of timestep 2 took 0.0305237 s.
+info: [time] Iteration #4 took 0.745738 s.
+info: [time] Solving process #0 took 2.96973 s in time step #2 
+info: [time] Time step #2 took 2.99931 s.
+info: [time] Output of timestep 2 took 0.0509546 s.
 info: === Time stepping at step #3 and time 180 with step size 60
-info: [time] Assembly took 0.171676 s.
-info: [time] Applying Dirichlet BCs took 0.0018139 s.
+info: [time] Assembly took 0.369569 s.
+info: [time] Applying Dirichlet BCs took 0.0019695 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -89,11 +89,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.169920e-21
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.362611 s.
+info: [time] Linear solver took 0.467784 s.
 info: Convergence criterion: |dx|=1.1907e+01, |x|=2.4050e+04, |dx|/|x|=4.9510e-04
-info: [time] Iteration #1 took 0.53618 s.
-info: [time] Assembly took 0.182398 s.
-info: [time] Applying Dirichlet BCs took 0.0018959 s.
+info: [time] Iteration #1 took 0.839524 s.
+info: [time] Assembly took 0.235292 s.
+info: [time] Applying Dirichlet BCs took 0.0036227 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -101,11 +101,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.113486e-21
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.36457 s.
+info: [time] Linear solver took 0.555913 s.
 info: Convergence criterion: |dx|=1.3310e+01, |x|=2.4049e+04, |dx|/|x|=5.5347e-04
-info: [time] Iteration #2 took 0.548951 s.
-info: [time] Assembly took 0.197485 s.
-info: [time] Applying Dirichlet BCs took 0.0048346 s.
+info: [time] Iteration #2 took 0.794995 s.
+info: [time] Assembly took 0.234619 s.
+info: [time] Applying Dirichlet BCs took 0.0030336 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -113,11 +113,11 @@ info: 	 iteration: 1/1000
 info: 	 residual: 3.382892e-19
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.399702 s.
+info: [time] Linear solver took 0.508161 s.
 info: Convergence criterion: |dx|=2.1219e-05, |x|=2.4049e+04, |dx|/|x|=8.8232e-10
-info: [time] Iteration #3 took 0.602576 s.
-info: [time] Assembly took 0.190868 s.
-info: [time] Applying Dirichlet BCs took 0.0024172 s.
+info: [time] Iteration #3 took 0.746003 s.
+info: [time] Assembly took 0.231061 s.
+info: [time] Applying Dirichlet BCs took 0.0024434 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -125,15 +125,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 8.628911e-25
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.344022 s.
+info: [time] Linear solver took 0.499928 s.
 info: Convergence criterion: |dx|=3.8487e-11, |x|=2.4049e+04, |dx|/|x|=1.6003e-15
-info: [time] Iteration #4 took 0.537405 s.
-info: [time] Solving process #0 took 2.22532 s in time step #3 
-info: [time] Time step #3 took 2.23682 s.
-info: [time] Output of timestep 3 took 0.0309355 s.
+info: [time] Iteration #4 took 0.73361 s.
+info: [time] Solving process #0 took 3.11655 s in time step #3 
+info: [time] Time step #3 took 3.13343 s.
+info: [time] Output of timestep 3 took 0.0504786 s.
 info: === Time stepping at step #4 and time 240 with step size 60
-info: [time] Assembly took 0.168323 s.
-info: [time] Applying Dirichlet BCs took 0.0020023 s.
+info: [time] Assembly took 0.214742 s.
+info: [time] Applying Dirichlet BCs took 0.0028679 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -141,11 +141,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 2.539573e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.34243 s.
+info: [time] Linear solver took 0.47919 s.
 info: Convergence criterion: |dx|=2.4514e+00, |x|=2.4049e+04, |dx|/|x|=1.0193e-04
-info: [time] Iteration #1 took 0.512846 s.
-info: [time] Assembly took 0.168727 s.
-info: [time] Applying Dirichlet BCs took 0.0018556 s.
+info: [time] Iteration #1 took 0.697015 s.
+info: [time] Assembly took 0.257176 s.
+info: [time] Applying Dirichlet BCs took 0.0024868 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -153,11 +153,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 8.807812e-23
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.336919 s.
+info: [time] Linear solver took 0.506522 s.
 info: Convergence criterion: |dx|=1.4898e+00, |x|=2.4049e+04, |dx|/|x|=6.1950e-05
-info: [time] Iteration #2 took 0.507583 s.
-info: [time] Assembly took 0.175245 s.
-info: [time] Applying Dirichlet BCs took 0.0021082 s.
+info: [time] Iteration #2 took 0.766358 s.
+info: [time] Assembly took 0.222885 s.
+info: [time] Applying Dirichlet BCs took 0.0033354 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -165,15 +165,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 3.786444e-20
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.334551 s.
+info: [time] Linear solver took 0.467719 s.
 info: Convergence criterion: |dx|=2.3750e-06, |x|=2.4049e+04, |dx|/|x|=9.8759e-11
-info: [time] Iteration #3 took 0.512004 s.
-info: [time] Solving process #0 took 1.53259 s in time step #4 
-info: [time] Time step #4 took 1.54453 s.
-info: [time] Output of timestep 4 took 0.0289595 s.
+info: [time] Iteration #3 took 0.694132 s.
+info: [time] Solving process #0 took 2.16025 s in time step #4 
+info: [time] Time step #4 took 2.17683 s.
+info: [time] Output of timestep 4 took 0.0495902 s.
 info: === Time stepping at step #5 and time 300 with step size 60
-info: [time] Assembly took 0.171821 s.
-info: [time] Applying Dirichlet BCs took 0.0017249 s.
+info: [time] Assembly took 0.239571 s.
+info: [time] Applying Dirichlet BCs took 0.0017853 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -181,11 +181,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 3.486736e-23
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.350679 s.
+info: [time] Linear solver took 0.487136 s.
 info: Convergence criterion: |dx|=8.4352e-01, |x|=2.4049e+04, |dx|/|x|=3.5076e-05
-info: [time] Iteration #1 took 0.524304 s.
-info: [time] Assembly took 0.169544 s.
-info: [time] Applying Dirichlet BCs took 0.0019161 s.
+info: [time] Iteration #1 took 0.72866 s.
+info: [time] Assembly took 0.278763 s.
+info: [time] Applying Dirichlet BCs took 0.0016556 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -193,11 +193,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 5.166906e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.335111 s.
+info: [time] Linear solver took 0.565789 s.
 info: Convergence criterion: |dx|=1.3532e-01, |x|=2.4049e+04, |dx|/|x|=5.6270e-06
-info: [time] Iteration #2 took 0.506651 s.
-info: [time] Assembly took 0.177897 s.
-info: [time] Applying Dirichlet BCs took 0.001733 s.
+info: [time] Iteration #2 took 0.84639 s.
+info: [time] Assembly took 0.257608 s.
+info: [time] Applying Dirichlet BCs took 0.00183 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -205,15 +205,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 3.439341e-21
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.323054 s.
+info: [time] Linear solver took 0.47857 s.
 info: Convergence criterion: |dx|=2.1573e-07, |x|=2.4049e+04, |dx|/|x|=8.9704e-12
-info: [time] Iteration #3 took 0.502768 s.
-info: [time] Solving process #0 took 1.53388 s in time step #5 
-info: [time] Time step #5 took 1.54586 s.
-info: [time] Output of timestep 5 took 0.028971 s.
+info: [time] Iteration #3 took 0.738196 s.
+info: [time] Solving process #0 took 2.31605 s in time step #5 
+info: [time] Time step #5 took 2.33277 s.
+info: [time] Output of timestep 5 took 0.0535084 s.
 info: === Time stepping at step #6 and time 360 with step size 60
-info: [time] Assembly took 0.155627 s.
-info: [time] Applying Dirichlet BCs took 0.0019558 s.
+info: [time] Assembly took 0.244138 s.
+info: [time] Applying Dirichlet BCs took 0.0025122 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -221,11 +221,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.608293e-23
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.329935 s.
+info: [time] Linear solver took 0.512556 s.
 info: Convergence criterion: |dx|=7.4899e-01, |x|=2.4049e+04, |dx|/|x|=3.1145e-05
-info: [time] Iteration #1 took 0.4876 s.
-info: [time] Assembly took 0.168461 s.
-info: [time] Applying Dirichlet BCs took 0.0022893 s.
+info: [time] Iteration #1 took 0.759421 s.
+info: [time] Assembly took 0.235893 s.
+info: [time] Applying Dirichlet BCs took 0.0019858 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -233,11 +233,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 9.322832e-25
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.326121 s.
+info: [time] Linear solver took 0.50718 s.
 info: Convergence criterion: |dx|=3.3495e-02, |x|=2.4049e+04, |dx|/|x|=1.3928e-06
-info: [time] Iteration #2 took 0.496946 s.
-info: [time] Assembly took 0.172265 s.
-info: [time] Applying Dirichlet BCs took 0.0017168 s.
+info: [time] Iteration #2 took 0.745222 s.
+info: [time] Assembly took 0.229638 s.
+info: [time] Applying Dirichlet BCs took 0.0021934 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -245,15 +245,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 8.513717e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.326127 s.
+info: [time] Linear solver took 0.539227 s.
 info: Convergence criterion: |dx|=5.3397e-08, |x|=2.4049e+04, |dx|/|x|=2.2204e-12
-info: [time] Iteration #3 took 0.500193 s.
-info: [time] Solving process #0 took 1.4848 s in time step #6 
-info: [time] Time step #6 took 1.49807 s.
-info: [time] Output of timestep 6 took 0.0298861 s.
+info: [time] Iteration #3 took 0.771237 s.
+info: [time] Solving process #0 took 2.27873 s in time step #6 
+info: [time] Time step #6 took 2.29644 s.
+info: [time] Output of timestep 6 took 0.0510549 s.
 info: === Time stepping at step #7 and time 420 with step size 60
-info: [time] Assembly took 0.155788 s.
-info: [time] Applying Dirichlet BCs took 0.0019368 s.
+info: [time] Assembly took 0.216015 s.
+info: [time] Applying Dirichlet BCs took 0.0022242 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -261,11 +261,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 9.152596e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.329105 s.
+info: [time] Linear solver took 0.632899 s.
 info: Convergence criterion: |dx|=7.3340e-01, |x|=2.4048e+04, |dx|/|x|=3.0497e-05
-info: [time] Iteration #1 took 0.486906 s.
-info: [time] Assembly took 0.171685 s.
-info: [time] Applying Dirichlet BCs took 0.0020283 s.
+info: [time] Iteration #1 took 0.851354 s.
+info: [time] Assembly took 0.270932 s.
+info: [time] Applying Dirichlet BCs took 0.0016959 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -273,11 +273,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.695470e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.335253 s.
+info: [time] Linear solver took 0.458715 s.
 info: Convergence criterion: |dx|=2.7337e-02, |x|=2.4048e+04, |dx|/|x|=1.1367e-06
-info: [time] Iteration #2 took 0.509055 s.
-info: [time] Assembly took 0.179449 s.
-info: [time] Applying Dirichlet BCs took 0.0018229 s.
+info: [time] Iteration #2 took 0.731537 s.
+info: [time] Assembly took 0.313401 s.
+info: [time] Applying Dirichlet BCs took 0.003958 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -285,15 +285,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 6.946713e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.310484 s.
+info: [time] Linear solver took 0.536607 s.
 info: Convergence criterion: |dx|=4.3579e-08, |x|=2.4048e+04, |dx|/|x|=1.8121e-12
-info: [time] Iteration #3 took 0.491835 s.
-info: [time] Solving process #0 took 1.48796 s in time step #7 
-info: [time] Time step #7 took 1.49985 s.
-info: [time] Output of timestep 7 took 0.0303109 s.
+info: [time] Iteration #3 took 0.854128 s.
+info: [time] Solving process #0 took 2.43959 s in time step #7 
+info: [time] Time step #7 took 2.45356 s.
+info: [time] Output of timestep 7 took 0.0507013 s.
 info: === Time stepping at step #8 and time 480 with step size 60
-info: [time] Assembly took 0.158617 s.
-info: [time] Applying Dirichlet BCs took 0.001919 s.
+info: [time] Assembly took 0.328928 s.
+info: [time] Applying Dirichlet BCs took 0.0026342 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -301,11 +301,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 7.802699e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.325171 s.
+info: [time] Linear solver took 0.580111 s.
 info: Convergence criterion: |dx|=7.1986e-01, |x|=2.4048e+04, |dx|/|x|=2.9934e-05
-info: [time] Iteration #1 took 0.485782 s.
-info: [time] Assembly took 0.170348 s.
-info: [time] Applying Dirichlet BCs took 0.0016887 s.
+info: [time] Iteration #1 took 0.911802 s.
+info: [time] Assembly took 0.288621 s.
+info: [time] Applying Dirichlet BCs took 0.0023713 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -313,11 +313,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 8.886648e-25
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.355414 s.
+info: [time] Linear solver took 0.506956 s.
 info: Convergence criterion: |dx|=2.6578e-02, |x|=2.4048e+04, |dx|/|x|=1.1052e-06
-info: [time] Iteration #2 took 0.527527 s.
-info: [time] Assembly took 0.17389 s.
-info: [time] Applying Dirichlet BCs took 0.0016684 s.
+info: [time] Iteration #2 took 0.798126 s.
+info: [time] Assembly took 0.305617 s.
+info: [time] Applying Dirichlet BCs took 0.0022673 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -325,15 +325,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 6.753732e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.322214 s.
+info: [time] Linear solver took 0.596924 s.
 info: Convergence criterion: |dx|=4.2369e-08, |x|=2.4048e+04, |dx|/|x|=1.7618e-12
-info: [time] Iteration #3 took 0.497853 s.
-info: [time] Solving process #0 took 1.51122 s in time step #8 
-info: [time] Time step #8 took 1.52387 s.
-info: [time] Output of timestep 8 took 0.031076 s.
+info: [time] Iteration #3 took 0.904977 s.
+info: [time] Solving process #0 took 2.61771 s in time step #8 
+info: [time] Time step #8 took 2.63502 s.
+info: [time] Output of timestep 8 took 0.0709847 s.
 info: === Time stepping at step #9 and time 540 with step size 60
-info: [time] Assembly took 0.163299 s.
-info: [time] Applying Dirichlet BCs took 0.0019974 s.
+info: [time] Assembly took 0.259069 s.
+info: [time] Applying Dirichlet BCs took 0.0019853 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -341,11 +341,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 7.219004e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.336253 s.
+info: [time] Linear solver took 0.488452 s.
 info: Convergence criterion: |dx|=7.0668e-01, |x|=2.4048e+04, |dx|/|x|=2.9386e-05
-info: [time] Iteration #1 took 0.501638 s.
-info: [time] Assembly took 0.174566 s.
-info: [time] Applying Dirichlet BCs took 0.0026674 s.
+info: [time] Iteration #1 took 0.7497 s.
+info: [time] Assembly took 0.269778 s.
+info: [time] Applying Dirichlet BCs took 0.0036151 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -353,11 +353,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 1.514668e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.335529 s.
+info: [time] Linear solver took 0.462109 s.
 info: Convergence criterion: |dx|=2.6070e-02, |x|=2.4048e+04, |dx|/|x|=1.0841e-06
-info: [time] Iteration #2 took 0.512838 s.
-info: [time] Assembly took 0.171897 s.
-info: [time] Applying Dirichlet BCs took 0.0020595 s.
+info: [time] Iteration #2 took 0.73572 s.
+info: [time] Assembly took 0.237296 s.
+info: [time] Applying Dirichlet BCs took 0.001707 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -365,15 +365,15 @@ info: 	 iteration: 1/1000
 info: 	 residual: 6.625546e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.355153 s.
+info: [time] Linear solver took 0.466086 s.
 info: Convergence criterion: |dx|=4.1560e-08, |x|=2.4048e+04, |dx|/|x|=1.7282e-12
-info: [time] Iteration #3 took 0.529188 s.
-info: [time] Solving process #0 took 1.54386 s in time step #9 
-info: [time] Time step #9 took 1.55567 s.
-info: [time] Output of timestep 9 took 0.0303854 s.
+info: [time] Iteration #3 took 0.705259 s.
+info: [time] Solving process #0 took 2.1935 s in time step #9 
+info: [time] Time step #9 took 2.21057 s.
+info: [time] Output of timestep 9 took 0.0500714 s.
 info: === Time stepping at step #10 and time 600 with step size 60
-info: [time] Assembly took 0.164394 s.
-info: [time] Applying Dirichlet BCs took 0.0019692 s.
+info: [time] Assembly took 0.214997 s.
+info: [time] Applying Dirichlet BCs took 0.0018008 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -381,11 +381,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 6.812524e-24
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.351997 s.
+info: [time] Linear solver took 0.551367 s.
 info: Convergence criterion: |dx|=6.9378e-01, |x|=2.4048e+04, |dx|/|x|=2.8850e-05
-info: [time] Iteration #1 took 0.518443 s.
-info: [time] Assembly took 0.171684 s.
-info: [time] Applying Dirichlet BCs took 0.001952 s.
+info: [time] Iteration #1 took 0.768347 s.
+info: [time] Assembly took 0.211621 s.
+info: [time] Applying Dirichlet BCs took 0.0022383 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -393,11 +393,11 @@ info: 	 iteration: 2/1000
 info: 	 residual: 6.790242e-25
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.331004 s.
+info: [time] Linear solver took 0.50498 s.
 info: Convergence criterion: |dx|=2.5582e-02, |x|=2.4048e+04, |dx|/|x|=1.0638e-06
-info: [time] Iteration #2 took 0.504723 s.
-info: [time] Assembly took 0.16842 s.
-info: [time] Applying Dirichlet BCs took 0.0023643 s.
+info: [time] Iteration #2 took 0.719007 s.
+info: [time] Assembly took 0.262091 s.
+info: [time] Applying Dirichlet BCs took 0.0021787 s.
 info: ------------------------------------------------------------------
 info: *** Eigen solver computation
 info: -> solve with BiCGSTAB (precon ILUT)
@@ -405,14 +405,14 @@ info: 	 iteration: 1/1000
 info: 	 residual: 6.502173e-22
 
 info: ------------------------------------------------------------------
-info: [time] Linear solver took 0.31335 s.
+info: [time] Linear solver took 0.586353 s.
 info: Convergence criterion: |dx|=4.0782e-08, |x|=2.4048e+04, |dx|/|x|=1.6958e-12
-info: [time] Iteration #3 took 0.484212 s.
-info: [time] Solving process #0 took 1.50744 s in time step #10 
-info: [time] Time step #10 took 1.52078 s.
-info: [time] Output of timestep 10 took 0.029454 s.
+info: [time] Iteration #3 took 0.850801 s.
+info: [time] Solving process #0 took 2.34096 s in time step #10 
+info: [time] Time step #10 took 2.35786 s.
+info: [time] Output of timestep 10 took 0.0513644 s.
 info: The whole computation of the time stepping took 10 steps, in which
 	 the accepted steps are 10, and the rejected steps are 0.
 
-info: [time] Execution took 17.0922 s.
-info: OGS terminated on 2022-02-07 15:36:17+0100.
+info: [time] Execution took 24.1453 s.
+info: OGS terminated on 2022-02-07 15:55:28+0100.

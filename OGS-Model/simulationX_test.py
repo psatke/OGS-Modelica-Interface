@@ -8,7 +8,6 @@
 import sys
 import socket
 import struct
-from pandas import read_csv
 import OpenGeoSys
 
 PORT = 5050
