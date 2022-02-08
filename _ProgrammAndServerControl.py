@@ -275,7 +275,7 @@ serverThread.start()
 try:
     sim = win32com.client.GetActiveObject()
 except:
-    sim = win32com.client.Dispatch('ESI.SimulationX42')
+    sim = win32com.client.Dispatch('ESI.SimulationX43')
 xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(
     pythoncom.IID_IDispatch, sim)
 simXThread = threading.Thread(
