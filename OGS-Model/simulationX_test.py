@@ -22,10 +22,6 @@ class BC(OpenGeoSys.BHENetwork):
         return (0, [295.15], [295.15], [0], [2.0E-04])
 
     def serverCommunication(self, t, dt, Tin_val, Tout_val, flowrate):
-        # TODO: Code for SimualtionX simulation
-        # with t; only take the last results for each time point
-        # TODO: say SimulationX the next time point from OGS
-
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
         headerSend = struct.pack('!IdII', 27, 60.0, 2, 2)
@@ -39,6 +35,8 @@ class BC(OpenGeoSys.BHENetwork):
         dataSimXUn = struct.unpack('!IddI4d', dataSimX)
         client.close()
 
+        # TODO: return multiple values in flowrate and Tin_val
+        # ! flowrate = [a, b, c] results in solver failure
         flowrate = [dataSimXUn[4]]
         Tin_val = [dataSimXUn[6]]
 
