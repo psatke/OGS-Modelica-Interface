@@ -56,7 +56,7 @@ def initProtocol():
 
 
 def initComTime():
-    barrier = threading.Barrier(2, timeout=20.0)
+    barrier = threading.Barrier(2, timeout=120.0)
     lock = threading.Lock()
     stepsSimX = -1
     stepsOGS = 0
@@ -138,6 +138,7 @@ def handleClient(conn, addr):
                                       df_OGS['kanal2(t)'].tail(1),
                                       df_OGS['kanal2(t-dt)'].tail(1))
             conn.sendall(dataOGS)
+            barrier.wait()
 
             if dataSimXUn[1] > (t_stopp - dt):
                 connected = False
@@ -178,8 +179,8 @@ def handleClient(conn, addr):
                                        df_SimX['kanal2(t)'].tail(1),
                                        df_SimX['kanal2(t-dt)'].tail(1))
             conn.sendall(dataSimX)
-
             connected = False
+            barrier.wait()
             print('[Server]\t calculation steps (SimX/OGS): ' +
                   str(stepsSimX) + '/' + str(stepsOGS))
         else:
@@ -259,7 +260,8 @@ start = time.time()
 
 dir = os.path.dirname(os.path.realpath(__file__))   # Directory of the .py file
 simX_model = 'CoSim_Test'
-OGS_project = 'beier_sandbox'
+# OGS_project = 'beier_sandbox'
+OGS_project = '3BHE_testcase'
 
 server, ADDR, activeConnList = initServer()
 df_SimX, df_OGS = initProtocol()

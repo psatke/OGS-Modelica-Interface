@@ -39,8 +39,8 @@ class BC(OpenGeoSys.BHENetwork):
         dataSimXUn = struct.unpack('!IddI4d', dataSimX)
         client.close()
 
-        flowrate = [dataSimXUn[4]]
-        Tin_val = [dataSimXUn[6]]
+        flowrate = [dataSimXUn[4]*3]
+        Tin_val = [dataSimXUn[6]*3]
 
         return (Tin_val, flowrate)
 
