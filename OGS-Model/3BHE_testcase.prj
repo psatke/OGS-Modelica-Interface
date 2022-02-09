@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <OpenGeoSysProject>
 	<meshes>
-		<mesh>project.vtu</mesh>
+		<mesh>mesh.vtu</mesh>
 	</meshes>
     <python_script>simulationX_test.py</python_script>
     <processes>
@@ -18,7 +18,7 @@
             <use_server_communication>true</use_server_communication>
             <borehole_heat_exchangers>
                 <borehole_heat_exchanger>
-                    <type>1U</type>
+                    <type>2U</type>
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
@@ -58,7 +58,7 @@
                     </refrigerant>
                 </borehole_heat_exchanger>
                 <borehole_heat_exchanger>
-                    <type>1U</type>
+                    <type>2U</type>
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
@@ -98,7 +98,7 @@
                     </refrigerant>
                 </borehole_heat_exchanger>
                 <borehole_heat_exchanger>
-                    <type>1U</type>
+                    <type>2U</type>
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
@@ -270,7 +270,7 @@
         <parameter>
             <name>T0_BHE</name>
             <type>Constant</type>
-            <values>295.15 295.15 295.15 295.15 </values>
+            <values>295.15 295.15 295.15 295.15 295.15 295.15 295.15 295.15</values>
         </parameter>
     </parameters>
     <process_variables>
@@ -284,19 +284,19 @@
         </process_variable>
         <process_variable>
             <name>temperature_BHE1</name>
-            <components>4</components>
+            <components>8</components>
             <order>1</order>
             <initial_condition>T0_BHE</initial_condition>
         </process_variable>
         <process_variable>
             <name>temperature_BHE2</name>
-            <components>4</components>
+            <components>8</components>
             <order>1</order>
             <initial_condition>T0_BHE</initial_condition>
         </process_variable>
         <process_variable>
             <name>temperature_BHE3</name>
-            <components>4</components>
+            <components>8</components>
             <order>1</order>
             <initial_condition>T0_BHE</initial_condition>
         </process_variable>
