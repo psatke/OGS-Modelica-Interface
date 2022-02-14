@@ -5,7 +5,6 @@
 # http://www.opengeosys.org/project/license
 ###
 
-import sys
 import socket
 import struct
 import OpenGeoSys
@@ -13,6 +12,13 @@ import OpenGeoSys
 PORT = 5050
 SERVER = '127.0.0.1'
 ADDR = (SERVER, PORT)
+# Temperature for each pipe + one constant volumeflow for all pipes
+noBHE = 3
+typeBHE = "2U"
+if typeBHE == "1U":
+    nop = noBHE
+elif typeBHE == "2U":
+    nop = 2*noBHE+1
 
 
 class BC(OpenGeoSys.BHENetwork):
@@ -25,27 +31,30 @@ class BC(OpenGeoSys.BHENetwork):
         # BHE 2U: len(Tin) = len(Tout) = len(Tout_node_id) = len(flowrate) = numberOfBHE*2
         # BHE 2U: Tin[0] = Input Temperature of first pipe of first BHE
         # BHE 2U: Tin[1] = Input Temperature of second pipe of first BHE
-        return (0, [295.15]*6, [295.15]*6, [0]*6, [2.0E-04]*6)
+        # one flowrate per BHE
+        return (0, [284.15]*(nop-1), [284.15]*(nop-1), [0]*(nop-1), [0.0]*noBHE)
 
     def serverCommunication(self, t, dt, Tin_val, Tout_val, flowrate):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        headerSend = struct.pack('!IdII', 27, 60.0, 2, 2)
+        headerSend = struct.pack('!IdII', 27, 60.0, nop, 2)
         client.sendall(headerSend)
         client.recv(20)
 
-        dataOGS = struct.pack('!IddIdd', 26, t, dt, 2,
-                              flowrate[0], Tout_val[0])
+        dataOGS = struct.pack('!IddI'+nop*'d',
+                              26,
+                              t,
+                              dt,
+                              nop,
+                              *Tout_val,
+                              sum(flowrate))
         client.sendall(dataOGS)
         dataSimX = client.recv(56)
         dataSimXUn = struct.unpack('!IddI4d', dataSimX)
         client.close()
 
-        # TODO: return multiple values in flowrate and Tin_val
-        # ! flowrate = [a, b, c] results in solver failure
-        flowrate = [dataSimXUn[4]]*6
-        Tin_val = [dataSimXUn[6]-10, dataSimXUn[6]-5, dataSimXUn[6],
-                   dataSimXUn[6]+5, dataSimXUn[6]+10, dataSimXUn[6]+15]
+        flowrate = [dataSimXUn[6]/noBHE]*noBHE
+        Tin_val = [dataSimXUn[4]]*(nop-1)
 
         return (Tin_val, flowrate)
 

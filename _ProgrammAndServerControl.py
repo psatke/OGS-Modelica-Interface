@@ -10,8 +10,7 @@ import time
 import win32com.client
 import pythoncom
 import subprocess
-
-import time     # Runtime test
+import time
 
 # ============== Functions ==============
 
@@ -27,94 +26,69 @@ def initServer():
 
 
 def initProtocol():
-    df_SimX = pd.DataFrame(columns=['Paket Code',
-                                    't',
-                                    'dt',
-                                    'n',
-                                    'kanal1(t)',
-                                    'kanal1(t-dt)',
-                                    'kanal2(t)',
-                                    'kanal2(t-dt)'])
-    df_OGS = pd.DataFrame(columns=['Paket Code',
-                                   't',
-                                   'dt',
-                                   'n',
-                                   'kanal1(t)',
-                                   'kanal1(t-dt)',
-                                   'kanal2(t)',
-                                   'kanal2(t-dt)'])
-# OGS will conntect after the first calculationstep. The initialization at t=0 is added manually.
-    df_OGS = df_OGS.append({'Paket Code': 26,
-                            't': 0.0,
-                            'dt': 60.0,
-                            'n': 2,
-                            'kanal1(t)': 0.0002,
-                            'kanal1(t-dt)': 0.0,
-                            'kanal2(t)': 295.15,
-                            'kanal2(t-dt)': 0.0}, ignore_index=True)
-    return df_SimX, df_OGS
+    # df_SimX = pd.DataFrame(columns=['Paket Code',
+    #                                 't',
+    #                                 'dt',
+    #                                 'n',
+    #                                 'kanal1(t)',
+    #                                 'kanal1(t-dt)',
+    #                                 'kanal2(t)',
+    #                                 'kanal2(t-dt)'])
+    lSimX = []
+    # df_OGS = pd.DataFrame(columns=['Paket Code',
+    #                                't',
+    #                                'dt',
+    #                                'n',
+    #                                'kanal1(t)',
+    #                                'kanal1(t-dt)',
+    #                                'kanal2(t)',
+    #                                'kanal2(t-dt)'])
+    lOGS = []
+    return lSimX, lOGS
 
 
-def initComTime():
+def initParameter():
     barrier = threading.Barrier(2, timeout=120.0)
     lock = threading.Lock()
     stepsSimX = -1
-    stepsOGS = 0
+    stepsOGS = -1
     t_stopp = 600     # End of simulationtime in s
     waitTotalSimX = 0
     waitTotalOGS = 0
-    return barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS
+    noBHE = 3
+    typeBHE = "2U"
+    # Temperature for each pipe + one constant volumeflow for all pipes
+    if typeBHE == "1U":
+        nop = noBHE+1
+    elif typeBHE == "2U":
+        nop = 2*noBHE+1
+
+    return barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS, nop
 
 
 def handleClient(conn, addr):
 
-    global stepsOGS, stepsSimX, df_SimX, df_OGS, waitTotalSimX, waitTotalOGS
+    global stepsOGS, stepsSimX, lSimX, lOGS, waitTotalSimX, waitTotalOGS, nop
 
     header = conn.recv(20)
     headerUn = struct.unpack('!IdII', header)
-    dt = headerUn[1]
-    conn.sendall(header)
-
-    # initialization of SimX at t=0
-    if headerUn[0] == 17 and stepsSimX == -1:
-        dataSimX = conn.recv(56)
-        dataSimXUn = struct.unpack('!IddI4d', dataSimX)
-        df_SimX = df_SimX.append({'Paket Code': dataSimXUn[0],
-                                  't': dataSimXUn[1],
-                                  'dt': dataSimXUn[2],
-                                  'n': dataSimXUn[3],
-                                  'kanal1(t)': dataSimXUn[4],
-                                  'kanal1(t-dt)': dataSimXUn[5],
-                                  'kanal2(t)': dataSimXUn[6],
-                                  'kanal2(t-dt)': dataSimXUn[7]}, ignore_index=True)
-        dataOGS = struct.pack('!IddI4d', 16,
-                              df_OGS['t'].tail(1),
-                              df_OGS['dt'].tail(1),
-                              2,
-                              df_OGS['kanal1(t)'].tail(1),
-                              df_OGS['kanal1(t-dt)'].tail(1),
-                              df_OGS['kanal2(t)'].tail(1),
-                              df_OGS['kanal2(t-dt)'].tail(1))
-        conn.sendall(dataOGS)
-        stepsSimX += 1
+    headerSend = struct.pack(
+        '!IdII', headerUn[0], headerUn[1], headerUn[3], headerUn[2])
+    conn.sendall(headerSend)
 
     connected = True
 
     while connected:
         # headerUn[0] = 17 is the identification for SimulationX
         if headerUn[0] == 17:
+            dt = headerUn[1]
+
             # receive results
-            dataSimX = conn.recv(56)
-            dataSimXUn = struct.unpack('!IddI4d', dataSimX)
+            datafromSimX = conn.recv(56)
+            datafromSimXUn = list(struct.unpack('!IddI4d', datafromSimX))
             with lock:
-                df_SimX = df_SimX.append({'Paket Code': dataSimXUn[0],
-                                          't': dataSimXUn[1],
-                                          'dt': dataSimXUn[2],
-                                          'n': dataSimXUn[3],
-                                          'kanal1(t)': dataSimXUn[4],
-                                          'kanal1(t-dt)': dataSimXUn[5],
-                                          'kanal2(t)': dataSimXUn[6],
-                                          'kanal2(t-dt)': dataSimXUn[7]}, ignore_index=True)
+                lSimX.append(datafromSimXUn)
+
             # synchronize
             waitStart = time.time()
             try:
@@ -124,38 +98,38 @@ def handleClient(conn, addr):
             finally:
                 stepsSimX += 1
             waitStop = time.time()
-            # print('[Server]\t SimX had to wait for:\t' +
-            #       str(waitStop-waitStart) + 's')
             waitTotalSimX = waitTotalSimX + (waitStop-waitStart)
+
             # send results
             with lock:
-                dataOGS = struct.pack('!IddI4d', 16,
-                                      df_OGS['t'].tail(1),
-                                      df_OGS['dt'].tail(1),
-                                      2,
-                                      df_OGS['kanal1(t)'].tail(1),
-                                      df_OGS['kanal1(t-dt)'].tail(1),
-                                      df_OGS['kanal2(t)'].tail(1),
-                                      df_OGS['kanal2(t-dt)'].tail(1))
-            conn.sendall(dataOGS)
+                package = [16]+lOGS[-1][1:3]+[nop-1]+lOGS[-1][4:-2]
+            dataforSimX = struct.pack('!IddI'+(nop-1)*2*'d', *package)
+            conn.sendall(dataforSimX)
+
             barrier.wait()
 
-            if dataSimXUn[1] > (t_stopp - dt):
+            if datafromSimXUn[1] > (t_stopp - dt):
                 connected = False
 
         # headerUn[0] = 27 is the identification for OGS
         elif headerUn[0] == 27:
+
             # receive results
-            dataOGS = conn.recv(40)
-            dataOGSUn = struct.unpack('!IddIdd', dataOGS)
+            datafromOGS = conn.recv(24+nop*8)
+            datafromOGSUn = struct.unpack('!IddI'+nop*'d', datafromOGS)
+            data = []
+            if len(lOGS) == 0:
+                for i in range(nop):
+                    data.append(datafromOGSUn[i+4])
+                    data.append(0.0)
+            else:
+                for i in range(nop):
+                    data.append(datafromOGSUn[i+4])
+                    data.append(lOGS[-1][i*2+4])
             with lock:
-                df_OGS = df_OGS.append({'Paket Code': dataOGSUn[0],
-                                        't': dataOGSUn[1], 'dt': dataOGSUn[2],
-                                        'n': dataOGSUn[3],
-                                        'kanal1(t)': dataOGSUn[4],
-                                        'kanal1(t-dt)': df_OGS.iat[-1, 4],
-                                        'kanal2(t)': dataOGSUn[5],
-                                        'kanal2(t-dt)': df_OGS.iat[-1, 6]}, ignore_index=True)
+                lOGS.append(
+                    [datafromOGSUn[0], datafromOGSUn[1], datafromOGSUn[2], datafromOGSUn[3]]+data)
+
             # synchronize
             waitStart = time.time()
             try:
@@ -165,20 +139,14 @@ def handleClient(conn, addr):
             finally:
                 stepsOGS += 1
             waitStop = time.time()
-            # print('[Server]\t OGS had to wait for:\t' +
-            #       str(waitStop-waitStart) + 's')
             waitTotalOGS = waitTotalOGS + (waitStop-waitStart)
+
             # send results
             with lock:
-                dataSimX = struct.pack('!IddI4d', 26,
-                                       df_SimX['t'].tail(1),
-                                       df_SimX['dt'].tail(1),
-                                       2,
-                                       df_SimX['kanal1(t)'].tail(1),
-                                       df_SimX['kanal1(t-dt)'].tail(1),
-                                       df_SimX['kanal2(t)'].tail(1),
-                                       df_SimX['kanal2(t-dt)'].tail(1))
-            conn.sendall(dataSimX)
+                package = [26]+lSimX[-1][1:]
+            dataforOGS = struct.pack('!IddI4d', *package)
+            conn.sendall(dataforOGS)
+
             connected = False
             barrier.wait()
             print('[Server]\t calculation steps (SimX/OGS): ' +
@@ -264,8 +232,8 @@ simX_model = 'CoSim_Test'
 OGS_project = '3BHE_testcase'
 
 server, ADDR, activeConnList = initServer()
-df_SimX, df_OGS = initProtocol()
-barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS = initComTime()
+lSimX, lOGS = initProtocol()
+barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS, nop = initParameter()
 
 print("[SERVER]\t is starting ...")
 serverThread = threading.Thread(target=handleServer, daemon=True)
@@ -292,6 +260,17 @@ savePathSimX = os.sep.join(
     [dir, "[Server] Com SimX.txt"])
 savePathOGS = os.sep.join(
     [dir, "[Server] Com OGS.txt"])
+
+df_SimX = pd.DataFrame(lSimX, columns=[
+                       'Paket Code', 't', 'dt', 'n', 'kanal1(t)', 'kanal1(t-dt)', 'kanal2(t)', 'kanal2(t-dt)'])
+
+colOGS = ['Paket Code', 't', 'dt', 'n']
+for i in range(len(lOGS)-4):
+    colOGS.append('kanal'+str(i+1)+'(t)')
+    colOGS.append('kanal'+str(i+1)+'(t-dt)')
+
+df_OGS = pd.DataFrame(lOGS, columns=colOGS)
+
 df_SimX.to_csv(savePathSimX, index=False)
 df_OGS.to_csv(savePathOGS, index=False)
 

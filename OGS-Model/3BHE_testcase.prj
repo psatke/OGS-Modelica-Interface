@@ -22,7 +22,7 @@
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
-                        <flow_rate>2.0e-4</flow_rate>
+                        <flow_rate>0.0</flow_rate>
                         <temperature_curve>inflow_temperature</temperature_curve>
                     </flow_and_temperature_control>
                     <borehole>
@@ -62,7 +62,7 @@
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
-                        <flow_rate>2.0e-4</flow_rate>
+                        <flow_rate>0.0</flow_rate>
                         <temperature_curve>inflow_temperature</temperature_curve>
                     </flow_and_temperature_control>
                     <borehole>
@@ -102,7 +102,7 @@
                     <use_bhe_pipe_network>false</use_bhe_pipe_network>
                     <flow_and_temperature_control>
                         <type>TemperatureCurveConstantFlow</type>
-                        <flow_rate>2.0e-4</flow_rate>
+                        <flow_rate>0.0</flow_rate>
                         <temperature_curve>inflow_temperature</temperature_curve>
                     </flow_and_temperature_control>
                     <borehole>
@@ -265,12 +265,12 @@
         <parameter>
             <name>T0</name>
             <type>Constant</type>
-            <value>295.15</value>
+            <value>284.15</value>
         </parameter>
         <parameter>
             <name>T0_BHE</name>
             <type>Constant</type>
-            <values>295.15 295.15 295.15 295.15 295.15 295.15 295.15 295.15</values>
+            <values>284.15 284.15 284.15 284.15 284.15 284.15 284.15 284.15</values>
         </parameter>
     </parameters>
     <process_variables>
