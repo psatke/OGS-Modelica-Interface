@@ -26,23 +26,28 @@ def initServer():
 
 
 def initProtocol():
-    # df_SimX = pd.DataFrame(columns=['Paket Code',
-    #                                 't',
-    #                                 'dt',
-    #                                 'n',
-    #                                 'kanal1(t)',
-    #                                 'kanal1(t-dt)',
-    #                                 'kanal2(t)',
-    #                                 'kanal2(t-dt)'])
+    # lSimX = [[Package Code,
+    #           SimulationTime t,
+    #           SimulationTimestep dt,
+    #           NumberOfChannels,
+    #           Channel1 at t,
+    #           Channel1 at t-dt,
+    #           Channel2 at t,
+    #           Channel2 at t-dt],
+    #           [following Timesteps],
+    #           ...]
     lSimX = []
-    # df_OGS = pd.DataFrame(columns=['Paket Code',
-    #                                't',
-    #                                'dt',
-    #                                'n',
-    #                                'kanal1(t)',
-    #                                'kanal1(t-dt)',
-    #                                'kanal2(t)',
-    #                                'kanal2(t-dt)'])
+    # lOGS = [[Package Code,
+    #           SimulationTime t,
+    #           SimulationTimestep dt,
+    #           NumberOfChannels,
+    #           Channel1 at t,
+    #           Channel1 at t-dt,
+    #           ...
+    #           Channel(NumberOfParameters) at t,
+    #           Channel(NumberOfParameters) at t-dt],
+    #           [following Timesteps],
+    #           ...]
     lOGS = []
     return lSimX, lOGS
 
@@ -52,14 +57,14 @@ def initParameter():
     lock = threading.Lock()
     stepsSimX = -1
     stepsOGS = -1
-    t_stopp = 600     # End of simulationtime in s
+    t_stopp = 60*60*24*365      # End of simulationtime in s
     waitTotalSimX = 0
     waitTotalOGS = 0
-    noBHE = 3
+    noBHE = 3           # Number of Borehole Heat Exchangers
     typeBHE = "2U"
     # Temperature for each pipe + one constant volumeflow for all pipes
     if typeBHE == "1U":
-        nop = noBHE+1
+        nop = noBHE+1   # Number of Parameters
     elif typeBHE == "2U":
         nop = 2*noBHE+1
 
@@ -227,9 +232,9 @@ def handleOGS():
 start = time.time()
 
 dir = os.path.dirname(os.path.realpath(__file__))   # Directory of the .py file
-simX_model = 'CoSim_Test'
+simX_model = 'Validierung'
 # OGS_project = 'beier_sandbox'
-OGS_project = '3BHE_testcase'
+OGS_project = '3BHE'
 
 server, ADDR, activeConnList = initServer()
 lSimX, lOGS = initProtocol()
@@ -265,7 +270,7 @@ df_SimX = pd.DataFrame(lSimX, columns=[
                        'Paket Code', 't', 'dt', 'n', 'kanal1(t)', 'kanal1(t-dt)', 'kanal2(t)', 'kanal2(t-dt)'])
 
 colOGS = ['Paket Code', 't', 'dt', 'n']
-for i in range(len(lOGS)-4):
+for i in range(len(lOGS[1])-4):
     colOGS.append('kanal'+str(i+1)+'(t)')
     colOGS.append('kanal'+str(i+1)+'(t-dt)')
 
