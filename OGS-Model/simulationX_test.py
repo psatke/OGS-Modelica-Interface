@@ -31,8 +31,7 @@ class BC(OpenGeoSys.BHENetwork):
         # BHE 2U: len(Tin) = len(Tout) = len(Tout_node_id) = len(flowrate) = numberOfBHE*2
         # BHE 2U: Tin[0] = Input Temperature of first pipe of first BHE
         # BHE 2U: Tin[1] = Input Temperature of second pipe of first BHE
-        # one flowrate per BHE
-        return (0, [284.15]*(nop-1), [284.15]*(nop-1), [0]*(nop-1), [0.0]*noBHE)
+        return (0, [284.15]*(nop-1), [284.15]*(nop-1), [0]*(nop-1), [0.0]*(nop-1))
 
     def serverCommunication(self, t, dt, Tin_val, Tout_val, flowrate):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -53,7 +52,7 @@ class BC(OpenGeoSys.BHENetwork):
         dataSimXUn = struct.unpack('!IddI4d', dataSimX)
         client.close()
 
-        flowrate = [dataSimXUn[6]/noBHE]*noBHE
+        flowrate = [dataSimXUn[6]/(nop-1)]*(nop-1)
         Tin_val = [dataSimXUn[4]]*(nop-1)
 
         return (Tin_val, flowrate)
