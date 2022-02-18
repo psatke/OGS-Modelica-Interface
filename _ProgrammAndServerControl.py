@@ -270,7 +270,7 @@ df_SimX = pd.DataFrame(lSimX, columns=[
                        'Paket Code', 't', 'dt', 'n', 'kanal1(t)', 'kanal1(t-dt)', 'kanal2(t)', 'kanal2(t-dt)'])
 
 colOGS = ['Paket Code', 't', 'dt', 'n']
-for i in range(len(lOGS[1])-4):
+for i in range((len(lOGS[0])-4)//2):
     colOGS.append('kanal'+str(i+1)+'(t)')
     colOGS.append('kanal'+str(i+1)+'(t-dt)')
 
@@ -284,3 +284,9 @@ end = time.time()
 print('[Server]\t OGS had to wait in total for:\t' + str(waitTotalOGS) + 's')
 print('[Server]\t SimX had to wait in total for:\t' + str(waitTotalSimX) + 's')
 print('[Server]\t Total runtime:\t\t\t' + str(end-start) + 's')
+
+file = open('[Server] runtime.txt', 'w+')
+file.write('OGS had to wait in total for:\t' + str(waitTotalOGS) + 's\n' +
+        'SimX had to wait in total for:\t' + str(waitTotalSimX) + 's\n' +
+        'Total runtime:\t\t\t' + str(end-start) + 's')
+file.close()
