@@ -4,7 +4,6 @@ import socket
 import threading
 import struct
 import pandas as pd
-import numpy as np
 import os
 import time
 import win32com.client
@@ -15,66 +14,12 @@ import time
 # ============== Functions ==============
 
 
-def initServer():
-    PORT = 5050
-    HOST = '0.0.0.0'
-    ADDR = (HOST, PORT)
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind(ADDR)
-    activeConnList = []
-    return server, ADDR, activeConnList
-
-
-def initProtocol():
-    # lSimX = [[Package Code,
-    #           SimulationTime t,
-    #           SimulationTimestep dt,
-    #           NumberOfChannels,
-    #           Channel1 at t,
-    #           Channel1 at t-dt,
-    #           Channel2 at t,
-    #           Channel2 at t-dt],
-    #           [following Timesteps],
-    #           ...]
-    lSimX = []
-    # lOGS = [[Package Code,
-    #           SimulationTime t,
-    #           SimulationTimestep dt,
-    #           NumberOfChannels,
-    #           Channel1 at t,
-    #           Channel1 at t-dt,
-    #           ...
-    #           Channel(NumberOfParameters) at t,
-    #           Channel(NumberOfParameters) at t-dt],
-    #           [following Timesteps],
-    #           ...]
-    lOGS = []
-    return lSimX, lOGS
-
-
-def initParameter():
-    barrier = threading.Barrier(2, timeout=120.0)
-    lock = threading.Lock()
-    stepsSimX = -1
-    stepsOGS = -1
-    t_stopp = 60*60*24*365      # End of simulationtime in s
-    waitTotalSimX = 0
-    waitTotalOGS = 0
-    noBHE = 3           # Number of Borehole Heat Exchangers
-    typeBHE = "2U"
-    # Temperature for each pipe + one constant volumeflow for all pipes
-    if typeBHE == "1U":
-        nop = noBHE+1   # Number of Parameters
-    elif typeBHE == "2U":
-        nop = 2*noBHE+1
-
-    return barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS, nop
-
-
 def handleClient(conn, addr):
 
-    global stepsOGS, stepsSimX, lSimX, lOGS, waitTotalSimX, waitTotalOGS, nop
-
+    # header = [Package Code,
+    #       Communication Step Size,
+    #       Transmitted Channels,
+    #       Received Channels]
     header = conn.recv(20)
     headerUn = struct.unpack('!IdII', header)
     headerSend = struct.pack(
@@ -82,85 +27,173 @@ def handleClient(conn, addr):
     conn.sendall(headerSend)
 
     connected = True
+    
+    # special case initialization: 
+    if trackingDict['currentStepOGS'] == -1 and headerUn[0] == 27:
+        # receive OGS initialization
+        datafromOGS = conn.recv(24+headerUn[2]*8)
+        datafromOGSUn = struct.unpack('!IddI'+headerUn[2]*'d', datafromOGS)
+        data = []
+        if len(lOGS) == 0:
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(0.0)
+        else:
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(lOGS[-1][i*2+4])
+        with lock:
+            lOGS.append(list(datafromOGSUn[0:4])+data)
 
-    while connected:
-        # headerUn[0] = 17 is the identification for SimulationX
-        if headerUn[0] == 17:
-            dt = headerUn[1]
+        synchronizeWithCount('OGS')
 
+        # send initialization back to OGS
+        with lock:
+            package = [26]+lSimX[-1][1:-2]
+        dataforOGS = struct.pack('!IddI4d', *package)
+        conn.sendall(dataforOGS)
+
+        synchronize('OGS')
+        
+
+    # headerUn[0] = 17 is the identification for SimulationX
+    elif headerUn[0] == 17:
+        # SimulationX maintains the connection for the whole simulation
+        # receive SimX initialization
+        datafromSimX = conn.recv(24+headerUn[2]*2*8)
+        datafromSimXUn = list(struct.unpack(
+            '!IddI'+headerUn[2]*2*'d', datafromSimX))
+        with lock:
+            lSimX.append(datafromSimXUn)
+        
+        synchronizeWithCount('SimX')
+
+        # send results initialization
+        with lock:
+            package = [16]+lOGS[-1][1:3] + \
+                [(len(lOGS[0])-6)//2]+lOGS[-1][4:-2]
+        dataforSimX = struct.pack('!IddI'+(len(lOGS[0])-6)*'d', *package)
+        conn.sendall(dataforSimX)
+
+        synchronize('SimX')
+
+        print('[Server]\t initialization completed (SimX/OGS): ' +
+              str(trackingDict['currentStepSimX']) + '/' + str(trackingDict['currentStepOGS']))
+
+        while connected:
             # receive results
-            datafromSimX = conn.recv(56)
-            datafromSimXUn = list(struct.unpack('!IddI4d', datafromSimX))
+            datafromSimX = conn.recv(24+headerUn[2]*2*8)
+            datafromSimXUn = list(struct.unpack(
+                '!IddI'+headerUn[2]*2*'d', datafromSimX))
+
             with lock:
                 lSimX.append(datafromSimXUn)
 
-            # synchronize
             waitStart = time.time()
             try:
                 barrier.wait()
             except threading.BrokenBarrierError:
                 print('[Server]\t handle_client(SimX): timeout Error')
+                quickSave()
             finally:
-                stepsSimX += 1
+                trackingDict['currentStepSimX'] += 1
+            
+            synchronize('SimX')
+
             waitStop = time.time()
-            waitTotalSimX = waitTotalSimX + (waitStop-waitStart)
+            trackingDict['waitTotalSimX'] += (waitStop-waitStart)
 
             # send results
             with lock:
-                package = [16]+lOGS[-1][1:3]+[nop-1]+lOGS[-1][4:-2]
-            dataforSimX = struct.pack('!IddI'+(nop-1)*2*'d', *package)
+                package = [16]+lOGS[-1][1:3] + \
+                    [(len(lOGS[0])-6)//2]+lOGS[-1][4:-2]
+            dataforSimX = struct.pack('!IddI'+(len(lOGS[0])-6)*'d', *package)
             conn.sendall(dataforSimX)
 
-            barrier.wait()
+            synchronize('SimX')
 
-            if datafromSimXUn[1] > (t_stopp - dt):
+            if datafromSimXUn[1] == simTimeFinalStep:
                 connected = False
 
-        # headerUn[0] = 27 is the identification for OGS
-        elif headerUn[0] == 27:
-
-            # receive results
-            datafromOGS = conn.recv(24+nop*8)
-            datafromOGSUn = struct.unpack('!IddI'+nop*'d', datafromOGS)
-            data = []
-            if len(lOGS) == 0:
-                for i in range(nop):
-                    data.append(datafromOGSUn[i+4])
-                    data.append(0.0)
-            else:
-                for i in range(nop):
-                    data.append(datafromOGSUn[i+4])
-                    data.append(lOGS[-1][i*2+4])
-            with lock:
-                lOGS.append(
-                    [datafromOGSUn[0], datafromOGSUn[1], datafromOGSUn[2], datafromOGSUn[3]]+data)
-
-            # synchronize
-            waitStart = time.time()
-            try:
-                barrier.wait()
-            except threading.BrokenBarrierError:
-                print('[Server]\t handle_client(OGS): timeout Error')
-            finally:
-                stepsOGS += 1
-            waitStop = time.time()
-            waitTotalOGS = waitTotalOGS + (waitStop-waitStart)
-
-            # send results
-            with lock:
-                package = [26]+lSimX[-1][1:]
-            dataforOGS = struct.pack('!IddI4d', *package)
-            conn.sendall(dataforOGS)
-
-            connected = False
-            barrier.wait()
-            print('[Server]\t calculation steps (SimX/OGS): ' +
-                  str(stepsSimX) + '/' + str(stepsOGS))
+    # headerUn[0] = 27 is the identification for OGS-Pre
+    elif headerUn[0] == 27:
+        # receive results
+        datafromOGS = conn.recv(24+headerUn[2]*8)
+        datafromOGSUn = struct.unpack('!IddI'+headerUn[2]*'d', datafromOGS)
+        data = []
+        if len(lOGS) == 0:
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(0.0)
         else:
-            print('[Server]\t handle_client(-): unidentified header')
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(lOGS[-1][i*2+4])
+        with lock:
+            lOGS.append(list(datafromOGSUn[0:4])+data)
+        waitStart = time.time()
+        
+        synchronize('OGS')
+
+        waitStop = time.time()
+        with lock:
+            trackingDict['waitTotalOGS'] += (waitStop-waitStart)
+        # send results
+        with lock:
+            package = [26]+lSimX[-1][1:-2]
+        dataforOGS = struct.pack('!IddI4d', *package)
+        conn.sendall(dataforOGS)
+
+    # headerUn[0] = 37 is the identification for OGS-Post
+    elif headerUn[0] == 37:
+        datafromOGS = conn.recv(24+headerUn[2]*8)
+        datafromOGSUn = struct.unpack('!IddI'+headerUn[2]*'d', datafromOGS)
+        data = []
+        if len(lOGS) == 0:
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(0.0)
+        else:
+            for i in range(headerUn[2]):
+                data.append(datafromOGSUn[i+4])
+                data.append(lOGS[-1][i*2+4])
+        with lock:
+            lOGS.append(list(datafromOGSUn[0:4])+data)
+
+        synchronizeWithCount('OGS')
+
+        synchronize('OGS')
+        
+        print('[Server]\t calculation steps (SimX/OGS): ' +
+              str(trackingDict['currentStepSimX']) + '/' + str(trackingDict['currentStepOGS']))
+    else:
+        print('[Server]\t handle_client(-): unknown header')
     activeConnList.remove([conn, addr])
     conn.shutdown(socket.SHUT_RDWR)
     conn.close()
+
+
+def synchronizeWithCount(clientStr):
+    waitStart = time.time()
+    try:
+        barrier.wait()
+    except threading.BrokenBarrierError:
+        print('[Server]\t handle_client({}): timeout Error'.format(clientStr))
+        quickSave()
+    finally:
+        with lock:
+            trackingDict['currentStep{}'.format(clientStr)] += 1
+    waitStop = time.time()
+    with lock:
+        trackingDict['waitTotal{}'.format(clientStr)] += (waitStop-waitStart)
+
+
+def synchronize(clientStr):
+    try:
+        barrier.wait()
+    except threading.BrokenBarrierError:
+        print('[Server]\t handle_client({}}): timeout Error'.format(clientStr))
+        quickSave()
 
 
 def handleServer():
@@ -211,34 +244,92 @@ def handleSimulationX(xl_id):
         print("[SIMULATIONX]\t calc completed")
 
 
-def handleOGS():
-    # start OGS
-    callOGS = r'{}\OGS-Model\ogs.exe -o {}\OGS-Model\results {}\OGS-Model\{}.prj > {}\OGS-Model\results\result.tec'.format(
-        dir, dir, dir, OGS_project, dir)
-    # subprocess.run(callOGS, shell=True)  # run OGS with Output in terminal
-    print('[OGS]\t\t running ...')
-    with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
-        with open(r'{}\OGS-Model\results\err.txt'.format(dir), 'w+') as ferr:
-            out = subprocess.call(
-                callOGS, cwd=dir, stdout=fout, stderr=ferr, shell=True)
-            fout.seek(0)
-            output = fout.read()
-            ferr.seek(0)
-            errors = ferr.read()
-    print('[OGS]\t\t calc completed')
+def quickSave():
+    savePathSimX = os.sep.join(
+        [dir, "[Server] Com SimX.txt"])
+    savePathOGS = os.sep.join(
+        [dir, "[Server] Com OGS.txt"])
+
+    df_SimX = pd.DataFrame(lSimX, columns=[
+                        'Paket Code', 
+                        't', 
+                        'dt', 
+                        'n', 
+                        'kanal1(t)', 
+                        'kanal1(t-dt)', 
+                        'kanal2(t)', 
+                        'kanal2(t-dt)', 
+                        'kanal3(t)', 
+                        'kanal3(t-dt)'])
+
+    colOGS = ['Paket Code', 't', 'dt', 'n']
+    for i in range((len(lOGS[0])-4)//2):
+        colOGS.append('kanal'+str(i+1)+'(t)')
+        colOGS.append('kanal'+str(i+1)+'(t-dt)')
+
+    df_OGS = pd.DataFrame(lOGS, columns=colOGS)
+
+    df_SimX.to_csv(savePathSimX, index=False)
+    df_OGS.to_csv(savePathOGS, index=False)
+
+    file = open('[Server] runtime.txt', 'w+')
+    file.write('OGS had to wait in total for:\t' + str(trackingDict["waitTotalOGS"]) + ' s\n' +'SimX had to wait in total for:\t' + str(trackingDict["waitTotalSimX"]) + ' s\n')
+    file.close()
 
 
 # ============== Main ==============
+
+# ______________ Initializaiton ______________
+
 start = time.time()
 
 dir = os.path.dirname(os.path.realpath(__file__))   # Directory of the .py file
 simX_model = 'Validierung'
-# OGS_project = 'beier_sandbox'
 OGS_project = '3BHE'
 
-server, ADDR, activeConnList = initServer()
-lSimX, lOGS = initProtocol()
-barrier, lock, stepsSimX, stepsOGS, t_stopp, waitTotalSimX, waitTotalOGS, nop = initParameter()
+PORT = 5050
+HOST = '0.0.0.0'
+ADDR = (HOST, PORT)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
+activeConnList = []
+
+# init Data Storage as lists
+# lSimX = [[Package Code,
+#           SimulationTime t,
+#           SimulationTimestep dt,
+#           NumberOfChannels,
+#           Channel1 at t,
+#           Channel1 at t-dt,
+#           ...
+#           Channel3 at t,
+#           Channel3 at t-dt],
+#           [following Timesteps],
+#           ...]
+lSimX = []
+# lOGS = [[Package Code,
+#           SimulationTime t,
+#           SimulationTimestep dt,
+#           NumberOfChannels,
+#           Channel1 at t,
+#           Channel1 at t-dt,
+#           ...
+#           Channel(NumberOfParameters) at t,
+#           Channel(NumberOfParameters) at t-dt],
+#           [following Timesteps],
+#           ...]
+lOGS = []
+
+barrier = threading.Barrier(2, timeout=120.0)
+lock = threading.Lock()
+simTimeFinalStep = 60*60*10
+trackingDict = {"currentStepSimX": -1, 
+    "currentStepOGS": -1,
+    "waitTotalSimX": 0,
+    "waitTotalOGS": 0}
+
+
+# ______________ Start Calculation ______________
 
 print("[SERVER]\t is starting ...")
 serverThread = threading.Thread(target=handleServer, daemon=True)
@@ -249,25 +340,43 @@ try:
     sim = win32com.client.GetActiveObject()
 except:
     sim = win32com.client.Dispatch('ESI.SimulationX43')
-xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(
-    pythoncom.IID_IDispatch, sim)
-simXThread = threading.Thread(
-    target=handleSimulationX, kwargs={'xl_id': xl_id})
+xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(pythoncom.IID_IDispatch, sim)
+simXThread = threading.Thread(target=handleSimulationX, kwargs={'xl_id': xl_id})
 simXThread.setName('Thread [SimX]')
 simXThread.start()
 
-handleOGS()
+callOGS = r'OGS-Model\ogs.exe -o OGS-Model\results OGS-Model\{}.prj > OGS-Model\results\result.tec'.format(OGS_project)
+# subprocess.run(r'OGS-Model\ogs.exe OGS-Model\3BHE.prj > result.tec &', shell=True) # run OGS with Output in terminal
+print('[OGS]\t\t running ...')
+with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
+    with open(r'{}\OGS-Model\results\err.txt'.format(dir), 'w+') as ferr:
+        out = subprocess.call(
+            callOGS, cwd=dir, stdout=fout, stderr=ferr, shell=True)
+        fout.seek(0)
+        output = fout.read()
+        ferr.seek(0)
+        errors = ferr.read()
+print('[OGS]\t\t calc completed')
 
 simXThread.join()
 
-# save communication protocoll
-savePathSimX = os.sep.join(
-    [dir, "[Server] Com SimX.txt"])
-savePathOGS = os.sep.join(
-    [dir, "[Server] Com OGS.txt"])
+
+# ______________ Save Results ______________
+
+savePathSimX = os.sep.join([dir, "[Server] Com SimX.txt"])
+savePathOGS = os.sep.join([dir, "[Server] Com OGS.txt"])
 
 df_SimX = pd.DataFrame(lSimX, columns=[
-                       'Paket Code', 't', 'dt', 'n', 'kanal1(t)', 'kanal1(t-dt)', 'kanal2(t)', 'kanal2(t-dt)'])
+                        'Paket Code',
+                        't',
+                        'dt',
+                        'n',
+                        'kanal1(t)',
+                        'kanal1(t-dt)', 
+                        'kanal2(t)', 
+                        'kanal2(t-dt)', 
+                        'kanal3(t)', 
+                        'kanal3(t-dt)'])
 
 colOGS = ['Paket Code', 't', 'dt', 'n']
 for i in range((len(lOGS[0])-4)//2):
@@ -281,12 +390,12 @@ df_OGS.to_csv(savePathOGS, index=False)
 
 end = time.time()
 
-print('[Server]\t OGS had to wait in total for:\t' + str(waitTotalOGS) + 's')
-print('[Server]\t SimX had to wait in total for:\t' + str(waitTotalSimX) + 's')
-print('[Server]\t Total runtime:\t\t\t' + str(end-start) + 's')
-
 file = open('[Server] runtime.txt', 'w+')
-file.write('OGS had to wait in total for:\t' + str(waitTotalOGS) + 's\n' +
-        'SimX had to wait in total for:\t' + str(waitTotalSimX) + 's\n' +
-        'Total runtime:\t\t\t' + str(end-start) + 's')
+file.write('OGS had to wait in total for:\t' + str(trackingDict['waitTotalOGS']) + ' s\n' +
+           'SimX had to wait in total for:\t' + str(trackingDict['waitTotalSimX']) + ' s\n' +
+           'Total runtime:\t\t\t' + str(end-start) + ' s')
 file.close()
+
+print('[Server]\t OGS had to wait in total for:\t' + str(trackingDict['waitTotalOGS']) + 's')
+print('[Server]\t SimX had to wait in total for:\t' + str(trackingDict['waitTotalSimX']) + 's')
+print('[Server]\t Total runtime:\t\t\t' + str(end-start) + 's')
