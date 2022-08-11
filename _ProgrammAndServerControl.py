@@ -1,3 +1,11 @@
+'''This programm manages the Co-Simulation of OpenGeoSys (OGS) and Modelica.
+
+The execution of this file will start Modelica in the simulation environment SimulationX and OGS.
+While both programs are running they will connect as clients to the server, that is started in the main part of this program.
+Multiple threads are responsible to manage Modelica, OGS and their communication. The communictaion is mainly determined by the
+Modelica component used for communictation (in this case from the SimulationX library GenericInterfaces.CoSimulation.Coupling).
+The communication with OGS on the other hand is defined in the file OGS-Model\PreAndPostTimestep.py'''
+
 # ============== Libraries ==============
 
 import socket
@@ -14,7 +22,8 @@ import time
 # ============== Functions ==============
 
 
-def handleClient(conn, addr):
+def handleClient(conn: str, addr: int) -> None:
+    '''Handles the communication to the clients Modelica and OGS'''
 
     # header = [Package Code,
     #       Communication Step Size,
@@ -173,30 +182,33 @@ def handleClient(conn, addr):
     conn.close()
 
 
-def synchronizeWithCount(clientStr):
+def synchronizeWithCount(client: str) -> None:
+    '''Synchronizes different threads for communication and increases the current Timestep'''
     waitStart = time.time()
     try:
         barrier.wait()
     except threading.BrokenBarrierError:
-        print('[Server]\t handle_client({}): timeout Error'.format(clientStr))
+        print('[Server]\t handle_client({}): timeout Error'.format(client))
         quickSave()
     finally:
         with lock:
-            trackingDict['currentStep{}'.format(clientStr)] += 1
+            trackingDict['currentStep{}'.format(client)] += 1
     waitStop = time.time()
     with lock:
-        trackingDict['waitTotal{}'.format(clientStr)] += (waitStop-waitStart)
+        trackingDict['waitTotal{}'.format(client)] += (waitStop-waitStart)
 
 
-def synchronize(clientStr):
+def synchronize(client: str) -> None:
+    '''Synchronizes different threads for communication'''
     try:
         barrier.wait()
     except threading.BrokenBarrierError:
-        print('[Server]\t handle_client({}}): timeout Error'.format(clientStr))
+        print('[Server]\t handle_client({}}): timeout Error'.format(client))
         quickSave()
 
 
-def handleServer():
+def handleServer() -> None:
+    '''Starts new threads for each client that trys to communicate'''
     server.listen()
     print(f"[SERVER]\t is listening on {ADDR}")
     i = 0
@@ -210,7 +222,8 @@ def handleServer():
         i += 1
 
 
-def handleSimulationX(xl_id):
+def handleSimulationX(xl_id) -> None:
+    '''Starts SimulationX'''
     pythoncom.CoInitialize()
     sim = win32com.client.Dispatch(
         pythoncom.CoGetInterfaceAndReleaseStream(xl_id, pythoncom.IID_IDispatch))
@@ -244,7 +257,8 @@ def handleSimulationX(xl_id):
         print("[SIMULATIONX]\t calc completed")
 
 
-def quickSave():
+def quickSave() -> None:
+    '''Saves the communication protocoll up this timestep'''
     savePathSimX = os.sep.join(
         [dir, "[Server] Com SimX.txt"])
     savePathOGS = os.sep.join(
@@ -341,6 +355,8 @@ try:
 except:
     sim = win32com.client.Dispatch('ESI.SimulationX43')
 xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(pythoncom.IID_IDispatch, sim)
+# help(type(xl_id))
+# print(isinstance(xl_id, pythoncom.PyIStream))
 simXThread = threading.Thread(target=handleSimulationX, kwargs={'xl_id': xl_id})
 simXThread.setName('Thread [SimX]')
 simXThread.start()
