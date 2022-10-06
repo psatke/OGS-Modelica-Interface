@@ -1,3 +1,0 @@
-OGS had to wait in total for:	8.31799840927124 s
-SimX had to wait in total for:	85.37434315681458 s
-Total runtime:			94.74275469779968 s

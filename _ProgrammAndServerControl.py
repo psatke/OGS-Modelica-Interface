@@ -36,8 +36,8 @@ def handleClient(conn: str, addr: int) -> None:
     conn.sendall(headerSend)
 
     connected = True
-    
-    # special case initialization: 
+
+    # special case initialization:
     if trackingDict['currentStepOGS'] == -1 and headerUn[0] == 27:
         # receive OGS initialization
         datafromOGS = conn.recv(24+headerUn[2]*8)
@@ -63,7 +63,6 @@ def handleClient(conn: str, addr: int) -> None:
         conn.sendall(dataforOGS)
 
         synchronize('OGS')
-        
 
     # headerUn[0] = 17 is the identification for SimulationX
     elif headerUn[0] == 17:
@@ -74,7 +73,7 @@ def handleClient(conn: str, addr: int) -> None:
             '!IddI'+headerUn[2]*2*'d', datafromSimX))
         with lock:
             lSimX.append(datafromSimXUn)
-        
+
         synchronizeWithCount('SimX')
 
         # send results initialization
@@ -106,7 +105,7 @@ def handleClient(conn: str, addr: int) -> None:
                 quickSave()
             finally:
                 trackingDict['currentStepSimX'] += 1
-            
+
             synchronize('SimX')
 
             waitStop = time.time()
@@ -141,7 +140,7 @@ def handleClient(conn: str, addr: int) -> None:
         with lock:
             lOGS.append(list(datafromOGSUn[0:4])+data)
         waitStart = time.time()
-        
+
         synchronize('OGS')
 
         waitStop = time.time()
@@ -172,7 +171,7 @@ def handleClient(conn: str, addr: int) -> None:
         synchronizeWithCount('OGS')
 
         synchronize('OGS')
-        
+
         print('[Server]\t calculation steps (SimX/OGS): ' +
               str(trackingDict['currentStepSimX']) + '/' + str(trackingDict['currentStepOGS']))
     else:
@@ -265,16 +264,16 @@ def quickSave() -> None:
         [dir, "[Server] Com OGS.txt"])
 
     df_SimX = pd.DataFrame(lSimX, columns=[
-                        'Paket Code', 
-                        't', 
-                        'dt', 
-                        'n', 
-                        'kanal1(t)', 
-                        'kanal1(t-dt)', 
-                        'kanal2(t)', 
-                        'kanal2(t-dt)', 
-                        'kanal3(t)', 
-                        'kanal3(t-dt)'])
+        'Paket Code',
+        't',
+        'dt',
+        'n',
+        'kanal1(t)',
+        'kanal1(t-dt)',
+        'kanal2(t)',
+        'kanal2(t-dt)',
+        'kanal3(t)',
+        'kanal3(t-dt)'])
 
     colOGS = ['Paket Code', 't', 'dt', 'n']
     for i in range((len(lOGS[0])-4)//2):
@@ -287,7 +286,8 @@ def quickSave() -> None:
     df_OGS.to_csv(savePathOGS, index=False)
 
     file = open('[Server] runtime.txt', 'w+')
-    file.write('OGS had to wait in total for:\t' + str(trackingDict["waitTotalOGS"]) + ' s\n' +'SimX had to wait in total for:\t' + str(trackingDict["waitTotalSimX"]) + ' s\n')
+    file.write('OGS had to wait in total for:\t' + str(trackingDict["waitTotalOGS"]) + ' s\n' +
+               'SimX had to wait in total for:\t' + str(trackingDict["waitTotalSimX"]) + ' s\n')
     file.close()
 
 
@@ -337,10 +337,10 @@ lOGS = []
 barrier = threading.Barrier(2, timeout=120.0)
 lock = threading.Lock()
 simTimeFinalStep = 60*60*10
-trackingDict = {"currentStepSimX": -1, 
-    "currentStepOGS": -1,
-    "waitTotalSimX": 0,
-    "waitTotalOGS": 0}
+trackingDict = {"currentStepSimX": -1,
+                "currentStepOGS": -1,
+                "waitTotalSimX": 0,
+                "waitTotalOGS": 0}
 
 
 # ______________ Start Calculation ______________
@@ -354,15 +354,15 @@ try:
     sim = win32com.client.GetActiveObject()
 except:
     sim = win32com.client.Dispatch('ESI.SimulationX43')
-xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(pythoncom.IID_IDispatch, sim)
-# help(type(xl_id))
-# print(isinstance(xl_id, pythoncom.PyIStream))
-simXThread = threading.Thread(target=handleSimulationX, kwargs={'xl_id': xl_id})
+xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(
+    pythoncom.IID_IDispatch, sim)
+simXThread = threading.Thread(
+    target=handleSimulationX, kwargs={'xl_id': xl_id})
 simXThread.setName('Thread [SimX]')
 simXThread.start()
 
-callOGS = r'OGS-Model\ogs.exe -o OGS-Model\results OGS-Model\{}.prj > OGS-Model\results\result.tec'.format(OGS_project)
-# subprocess.run(r'OGS-Model\ogs.exe OGS-Model\3BHE.prj > result.tec &', shell=True) # run OGS with Output in terminal
+callOGS = r'OGS-Model\ogs.exe -o OGS-Model\results OGS-Model\{}.prj > OGS-Model\results\result.tec'.format(
+    OGS_project)
 print('[OGS]\t\t running ...')
 with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
     with open(r'{}\OGS-Model\results\err.txt'.format(dir), 'w+') as ferr:
@@ -383,16 +383,16 @@ savePathSimX = os.sep.join([dir, "[Server] Com SimX.txt"])
 savePathOGS = os.sep.join([dir, "[Server] Com OGS.txt"])
 
 df_SimX = pd.DataFrame(lSimX, columns=[
-                        'Paket Code',
-                        't',
-                        'dt',
-                        'n',
-                        'kanal1(t)',
-                        'kanal1(t-dt)', 
-                        'kanal2(t)', 
-                        'kanal2(t-dt)', 
-                        'kanal3(t)', 
-                        'kanal3(t-dt)'])
+    'Paket Code',
+    't',
+    'dt',
+    'n',
+    'kanal1(t)',
+    'kanal1(t-dt)',
+    'kanal2(t)',
+    'kanal2(t-dt)',
+    'kanal3(t)',
+    'kanal3(t-dt)'])
 
 colOGS = ['Paket Code', 't', 'dt', 'n']
 for i in range((len(lOGS[0])-4)//2):
@@ -412,6 +412,8 @@ file.write('OGS had to wait in total for:\t' + str(trackingDict['waitTotalOGS'])
            'Total runtime:\t\t\t' + str(end-start) + ' s')
 file.close()
 
-print('[Server]\t OGS had to wait in total for:\t' + str(trackingDict['waitTotalOGS']) + 's')
-print('[Server]\t SimX had to wait in total for:\t' + str(trackingDict['waitTotalSimX']) + 's')
+print('[Server]\t OGS had to wait in total for:\t' +
+      str(trackingDict['waitTotalOGS']) + 's')
+print('[Server]\t SimX had to wait in total for:\t' +
+      str(trackingDict['waitTotalSimX']) + 's')
 print('[Server]\t Total runtime:\t\t\t' + str(end-start) + 's')
