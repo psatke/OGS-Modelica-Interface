@@ -56,7 +56,7 @@ class BC(OpenGeoSys.BHENetwork):
 
         return (Tin_val, flowrate)
 
-    # ! Achtung: serverCommunication_post wird bei der Initialisierung nicht aufgerufen
+    # ! Attention: serverCommunication_post is not called at initialization
     def serverCommunicationPostTimestep(self, t, dt, Tin_val, Tout_val, flowrate):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)

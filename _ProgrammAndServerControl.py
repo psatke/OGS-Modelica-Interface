@@ -298,7 +298,7 @@ def quickSave() -> None:
 start = time.time()
 
 dir = os.path.dirname(os.path.realpath(__file__))   # Directory of the .py file
-simX_model = 'Validierung'
+simX_model = 'validation'
 OGS_project = '3BHE'
 
 PORT = 5050
@@ -336,7 +336,7 @@ lOGS = []
 
 barrier = threading.Barrier(2, timeout=120.0)
 lock = threading.Lock()
-simTimeFinalStep = 60*60*10
+simTimeFinalStep = 60*60*10 # in seconds
 trackingDict = {"currentStepSimX": -1,
                 "currentStepOGS": -1,
                 "waitTotalSimX": 0,
