@@ -9,3 +9,6 @@ To successfully run _ProgrammAndServerControl.py without further adaptations Sim
 The Modelica model simulates a single family home that is thermally supplied by a heating system consisting of a heat pump, a heat storage, a plate heat exchanger (for cooling) and floor heating. The OGS model includes three double U-pipe borehole heat exchangers with a length of 100 m and the surrounding soil.
 
 ![Model Scheme](img/ModelScheme.png "Scheme of the OGS model and the Modelica model")
+
+## Communication
+
