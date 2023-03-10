@@ -1,4 +1,6 @@
 # OGS-Modelica-Interface
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
 This interface passes information from an OpenGeoSys-Model to a Modelica-Model using the Transmission Control Protocol/Internet Protocol. The Co-simulation is controlled by _ProgrammAndServerControl.py which starts a communication server, SimulationX (client) and OGS (client) as well as handeling the information transfer and saving the results.
 
 ## Requirements
@@ -24,7 +26,8 @@ Exchange of the OGS model:
 Exchange of the Modelica model:
 * parameters of the component `InterfacesGeneral.CoSimulation.Coupling` need to match the OGS model
 * additional `GreenCity.Interfaces.Thermal.DefineVolumeFlow` may be required
-* the final timestep (`simTimeFinalStep=3600`) and the project name (`simX_model='Validierung'`) need to be defined in OGS-Model/_ProgrammAndServerConrol.py
+* the final timestep (`simTimeFinalStep=3600`) and the project name (`simX_model='Validierung'`) need to be defined in _ProgrammAndServerConrol.py
 
 ## Puplications
 ## License
+Creative Commons Attribution 4.0 International Public License
