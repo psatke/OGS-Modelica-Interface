@@ -1,7 +1,171 @@
 ﻿// CP: 65001
-// SimulationX Version: 4.2.4.69610
+// SimulationX Version: 4.3.2.71764
 within Custome_Blocks.Green_City;
 model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
+	parameter Real rhoMedSource(
+		quantity="Basics.Density",
+		displayUnit="kg/m³")=1113.1 "Density of the source medium" annotation(Dialog(
+		group="Source Medium",
+		tab="Media"));
+	parameter Real cpMedSource(
+		quantity="Thermics.SpecHeatCapacity",
+		displayUnit="J/(kg·K)")=3680 "Specific heat capacity of the source medium" annotation(Dialog(
+		group="Source Medium",
+		tab="Media"));
+	parameter Real rhoMedSink(
+		quantity="Basics.Density",
+		displayUnit="kg/m³")=1000 "Density of the sink medium (heating circuit)" annotation(Dialog(
+		group="Sink Medium",
+		tab="Media"));
+	parameter Real cpMedSink(
+		quantity="Thermics.SpecHeatCapacity",
+		displayUnit="J/(kg·K)")=4177 "Specific heat capacity of the sink medium (heating circuit)" annotation(Dialog(
+		group="Sink Medium",
+		tab="Media"));
+	parameter Real TRoomUnheated(
+		quantity="Thermics.Temp",
+		displayUnit="°C")=286.15 "Temperatur of the unheated room containing the heating and cooling systems" annotation(Dialog(
+		group="Ambient Temperatur",
+		tab="Media"));
+	parameter Modelica.Units.SI.Time timePoints[:]={10368000,23587200} "Vector of time points to activate or deactivate heating (default: activated untill first point)" annotation(Dialog(
+		group="Controls",
+		tab="Heat Pump"));
+	parameter Real TFlowRefSink(
+		quantity="Thermics.Temp",
+		displayUnit="°C")=313.15 "Temperatur Referenz of heated heat pump output" annotation(Dialog(
+		group="Controls",
+		tab="Heat Pump"));
+	parameter Real TRefHeatStorage(
+		quantity="Thermics.Temp",
+		displayUnit="°C")=308.15 "Referenz temperatur of the hottest heat storage layer" annotation(Dialog(
+		group="Controls",
+		tab="Heat Pump"));
+	parameter Boolean ConstantPowerOutput=false "If false: compressor is modulated, else not" annotation(Dialog(
+		group="Modulation",
+		tab="Heat Pump"));
+	parameter Real RelModMin(
+		quantity="Basics.RelMagnitude",
+		displayUnit="%")=0.2 if not ConstantPowerOutput "Minimum degree of compressor power modulation" annotation(Dialog(
+		group="Modulation",
+		tab="Heat Pump"));
+	parameter Real VHP(
+		quantity="Geometry.Volume",
+		displayUnit="l")=0.0046 "Heating medium volume of Heat Pump" annotation(Dialog(
+		group="Media Volume",
+		tab="Heat Pump"));
+	parameter Real VSource(
+		quantity="Geometry.Volume",
+		displayUnit="l")=0.0045 "Volume of source medium inside of Heat Pump" annotation(Dialog(
+		group="Media Volume",
+		tab="Heat Pump"));
+	parameter Real QLossRateHeatPump(
+		quantity="Thermics.HeatCond",
+		displayUnit="W/K")=5 "Heat loss rate of Heat Pump isolation" annotation(Dialog(
+		group="Heat Loss",
+		tab="Heat Pump"));
+	parameter Real qvSource(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="l/h")=0.0005833333333333333 "Constant velocity of source pump" annotation(Dialog(
+		group="Volume Flow",
+		tab="Heat Pump"));
+	parameter Real qvMax(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="l/h")=0.0008652777777777777 "Maximum volume flow of sink pump (heating circuit)" annotation(Dialog(
+		group="Volume Flow",
+		tab="Heat Pump"));
+	parameter Real qvMin(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="l/h")=0.0003097222222222222 "Minimum volume flow of sink pump (heating circuit)" annotation(Dialog(
+		group="Volume Flow",
+		tab="Heat Pump"));
+	parameter Real VStorage(
+		quantity="Geometry.Volume",
+		displayUnit="l")=0.4 "Heat storage volume" annotation(Dialog(
+		group="Dimension",
+		tab="Heat Storage"));
+	parameter Real dStorage(
+		quantity="Geometry.Length",
+		displayUnit="m")=0.859 "Diameter of heat Storage" annotation(Dialog(
+		group="Dimension",
+		tab="Heat Storage"));
+	parameter Real QLossRateStorage(
+		quantity="Thermics.HeatCond",
+		displayUnit="W/K")=1.66667 "Heat conductance of heat storage isolation" annotation(Dialog(
+		group="Dimension",
+		tab="Heat Storage"));
+	parameter Real QLossCoefficientPipe(
+		quantity="Thermics.SpecHeatCond",
+		displayUnit="W/(m·K)")=0.2 "Heat loss coefficient through each pipe insulation" annotation(Dialog(
+		group="Dimension",
+		tab="Pipes"));
+	parameter Real lPipe(
+		quantity="Geometry.Length",
+		displayUnit="m")=10 "Length of each pipe" annotation(Dialog(
+		group="Dimension",
+		tab="Pipes"));
+	parameter Real dPipe(
+		quantity="Geometry.Length",
+		displayUnit="mm")=0.032 "Diameter of each pipe" annotation(Dialog(
+		group="Dimension",
+		tab="Pipes"));
+	Real COP(quantity="Basics.Real") "Current COP of heat pump (HeatPump)" annotation(Dialog(
+		group="Heat Pump",
+		tab="Results",
+		visible=false));
+	Real QHeat(
+		quantity="Basics.Power",
+		displayUnit="kW") "Heat output power of HP (HeatPump)" annotation(Dialog(
+		group="Heat Pump",
+		tab="Results",
+		visible=false));
+	Real PCOMP(
+		quantity="Basics.Power",
+		displayUnit="kW") "Effective power of compressor (HeatPump)" annotation(Dialog(
+		group="Heat Pump",
+		tab="Results",
+		visible=false));
+	Real EHeat(
+		quantity="Basics.Energy",
+		displayUnit="kWh") "Heat output of heat pump (HeatPump)" annotation(Dialog(
+		group="Heat Pump",
+		tab="Results",
+		visible=false));
+	Real ECOMP(
+		quantity="Basics.Energy",
+		displayUnit="kWh") "Electrical energy demand of compressor (HeatPump)" annotation(Dialog(
+		group="Heat Pump",
+		tab="Results",
+		visible=false));
+	Real qvRef(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="m³/h") "Volume flow from Heat Pump to Heat Storage" annotation(Dialog(
+		group="Heat Controller",
+		tab="Results",
+		visible=false));
+	Real TFlow(
+		quantity="Thermics.Temp",
+		displayUnit="°C") "Temperature of Medium from Heat Pump to Heat Storage" annotation(Dialog(
+		group="Heat Controller",
+		tab="Results",
+		visible=false));
+	Real TReturn(
+		quantity="Thermics.Temp",
+		displayUnit="°C") "Temperature of Medium from Heat Storage to Heat Pump" annotation(Dialog(
+		group="Heat Controller",
+		tab="Results",
+		visible=false));
+	Real qvSourceRef(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="m³/h") "Volume flow of the source Medium" annotation(Dialog(
+		group="Heat Controller",
+		tab="Results",
+		visible=false));
+	Real TStorage[4](
+		quantity="Thermics.Temp",
+		displayUnit="°C") "Output of heat storage layer temperatures" annotation(Dialog(
+		group="Heat Storage",
+		tab="Results",
+		visible=false));
 	GreenCity.Interfaces.Thermal.VolumeFlowIn PipeInNetwork "Thermal Volume Flow Input Connector" annotation(Placement(
 		transformation(extent={{-110,-15},{-90,5}}),
 		iconTransformation(extent={{-210,290},{-190,310}})));
@@ -14,85 +178,119 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 	GreenCity.Interfaces.Thermal.VolumeFlowOut PipeOutConsumer "Thermal Volume Flow Output Connector" annotation(Placement(
 		transformation(extent={{340,-15},{360,5}}),
 		iconTransformation(extent={{186.7,290},{206.7,310}})));
+	Modelica.Blocks.Interfaces.RealInput qv_Consumer(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="l/h") "'input Real' as connector" annotation(
+		Placement(
+			transformation(extent={{380,-125},{340,-85}}),
+			iconTransformation(extent={{216.7,-170},{176.7,-130}})),
+		Dialog(
+			group="I/O",
+			tab="Results",
+			visible=false));
+	Modelica.Blocks.Interfaces.BooleanInput CoolingReq "'input Boolean' as connector" annotation(
+		Placement(
+			transformation(extent={{380.1,-165},{340.1,-125}}),
+			iconTransformation(extent={{216.7,-320},{176.7,-280}})),
+		Dialog(
+			group="I/O",
+			tab="Results",
+			visible=false));
+	Modelica.Blocks.Interfaces.RealOutput qv_Network(
+		quantity="Thermics.VolumeFlow",
+		displayUnit="l/h") "'output Real' as connector" annotation(
+		Placement(
+			transformation(extent={{-95,-115},{-115,-95}}),
+			iconTransformation(extent={{-190,-160},{-210,-140}})),
+		Dialog(
+			group="I/O",
+			tab="Results",
+			visible=false));
 	GreenCity.Interfaces.Electrical.LV3Phase LVGrid "Electrical Low-Voltage AC Three-Phase Connector" annotation(Placement(
 		transformation(extent={{180,-245},{200,-225}}),
 		iconTransformation(extent={{90,-406.7},{110,-386.7}})));
-	GreenCity.Utilities.Thermal.MergingValve MergingValveGeb "Valve for volume flow merging" annotation(Placement(transformation(extent={{250,-15},{230,5}})));
-	GreenCity.Utilities.Thermal.Pump PumpGeb(qvMax=10000) annotation(Placement(transformation(extent={{245,-90},{265,-70}})));
-	GreenCity.Utilities.Thermal.DistributionValve DistributionValveGeb annotation(Placement(transformation(extent={{240,-70},{220,-90}})));
-	Modelica.Blocks.Logical.Switch SwitchGeb annotation(Placement(transformation(extent={{285,-155},{265,-135}})));
-	Modelica.Blocks.Sources.RealExpression NoCoolingFlow(y(quantity="Thermics.VolumeFlow")) annotation(Placement(transformation(extent={{320,-165},{300,-145}})));
-	GreenCity.Utilities.Thermal.Pipe PipeGebIn(
-		QLossCoefficient=0.2,
-		lPipe=75,
-		dPipe(displayUnit="mm")=0.032,
-		TPipeInit=308.15) annotation(Placement(transformation(extent={{275,-10},{295,0}})));
-	GreenCity.Utilities.Thermal.Pipe PipeGebOut(
-		QLossCoefficient=0.2,
-		lPipe=75,
-		dPipe(displayUnit="mm")=0.032,
-		TPipeInit=308.15) annotation(Placement(transformation(extent={{295,-55},{275,-45}})));
+	HeatPumpCOP HeatPump(
+		COP=COP,
+		QHeat=QHeat,
+		PCOMP=PCOMP,
+		EHeat=EHeat,
+		ECOMP=ECOMP,
+		ConstantPowerOutput=ConstantPowerOutput,
+		RelModMin=RelModMin,
+		cpMed=cpMedSink,
+		rhoMed=rhoMedSink,
+		VHP=VHP,
+		TAmbient=TRoomUnheated,
+		QlossRate=QLossRateHeatPump,
+		CosPhiCOMP=0.9,
+		TFlowMin=303.15,
+		cpMedSource=cpMedSource,
+		rhoMedSource=rhoMedSource,
+		VSource=VSource) annotation(Placement(transformation(extent={{45,-30},{85,10}})));
+	GreenCity.Local.Controller.HeatController HeatController(
+		TFlow=TFlow,
+		TReturn=TReturn,
+		qvRef=qvRef,
+		qvSourceRef=qvSourceRef,
+		HeatPump=true,
+		Modulation=not ConstantPowerOutput,
+		RelModMin=RelModMin,
+		deltaTActRefLow=-1,
+		qvSource=qvSource,
+		deltaTFlowRefMin=-5,
+		qvMax=qvMax,
+		qvMin=qvMin) annotation(Placement(transformation(extent={{120,20},{80,60}})));
 	GreenCity.StorageSystems.HeatStorage HeatStorage(
-		SOC=SOC1,
-		VStorage(displayUnit="l")=0.6,
-		dStorage(displayUnit="dm")=0.6000000000000001,
-		TupInit=308.15,
-		TlowInit=303.15,
+		TStorage=TStorage,
+		VStorage(displayUnit="l")=VStorage,
+		dStorage(displayUnit="cm")=dStorage,
+		QlossRate=QLossRateStorage,
+		TupInit=TRefHeatStorage,
+		TlowInit=TRefHeatStorage-5,
 		EnvironmentInput=false,
 		n=4,
+		cpMed=cpMedSink,
+		rhoMed=rhoMedSink,
 		use1=true,
 		iFlow1=4,
 		use4=false,
 		iFlow4=4,
 		use6=true,
 		iFlow6=4) annotation(Placement(transformation(extent={{170,-63},{200,10}})));
+	GreenCity.Utilities.Thermal.HeatExchanger HeatExchanger(
+		cpMedprim=cpMedSource,
+		cpMedsec=cpMedSink,
+		rhoMedprim=rhoMedSource,
+		rhoMedsec=rhoMedSink,
+		TAmbient=TRoomUnheated) annotation(Placement(transformation(extent={{40,-90},{60,-70}})));
+	GreenCity.Utilities.Thermal.MergingValve MergingValveGeb(
+		TAmbient=TRoomUnheated,
+		cpMed=cpMedSink,
+		rhoMed=rhoMedSink) "Valve for volume flow merging" annotation(Placement(transformation(extent={{250,-15},{230,5}})));
+	GreenCity.Utilities.Thermal.DistributionValve DistributionValveGeb annotation(Placement(transformation(extent={{240,-70},{220,-90}})));
+	GreenCity.Utilities.Thermal.MergingValve MergingValveAnlage(
+		TAmbient=TRoomUnheated,
+		cpMed=cpMedSource,
+		rhoMed=rhoMedSource) annotation(Placement(transformation(extent={{5,-90},{25,-70}})));
+	GreenCity.Utilities.Thermal.DistributionValve DistributionValveAnlage annotation(Placement(transformation(extent={{5,-15},{25,5}})));
+	GreenCity.Utilities.Thermal.Pipe PipeGebIn(
+		QLossCoefficient=QLossCoefficientPipe,
+		lPipe=lPipe,
+		dPipe(displayUnit="mm")=dPipe,
+		TPipeInit=TRoomUnheated,
+		rhoMed=rhoMedSink,
+		cpMed=cpMedSink) annotation(Placement(transformation(extent={{275,-10},{295,0}})));
+	GreenCity.Utilities.Thermal.Pipe PipeGebOut(
+		QLossCoefficient=QLossCoefficientPipe,
+		lPipe=lPipe,
+		dPipe(displayUnit="mm")=dPipe,
+		TPipeInit=TRoomUnheated,
+		rhoMed=rhoMedSink,
+		cpMed=cpMedSink) annotation(Placement(transformation(extent={{295,-55},{275,-45}})));
 	GreenCity.Utilities.Thermal.MeasureThermal MeasureThermalFlowHp annotation(Placement(transformation(extent={{140,10},{160,-10}})));
 	GreenCity.Utilities.Thermal.MeasureThermal MeasureThermalReturnHp annotation(Placement(transformation(extent={{145,-10},{125,-30}})));
-	GreenCity.Local.Controller.HeatController HeatController(
-		HeatPump=true,
-		Modulation=false,
-		deltaTActRefLow=-1,
-		deltaTFlowRefMin=-5) annotation(Placement(transformation(extent={{120,20},{80,60}})));
+	GreenCity.Utilities.Thermal.Pump PumpGeb(qvMax=10000) annotation(Placement(transformation(extent={{245,-90},{265,-70}})));
 	GreenCity.Utilities.Thermal.Pump PumpHeatStorage(qvMax=self.HeatController.qvMax) annotation(Placement(transformation(extent={{100,-10},{120,-30}})));
-	GreenCity.Local.HeatPump HeatPump(
-		COP=COP1,
-		ConstantPowerOutput=true,
-		TAmbient=286.15,
-		QlossRate=5,
-		CosPhiCOMP=0.9,
-		TFlowMin=303.15) annotation(Placement(transformation(extent={{45,-30},{85,10}})));
-	GreenCity.Utilities.Thermal.DistributionValve DistributionValveAnlage annotation(Placement(transformation(extent={{5,-15},{25,5}})));
-	Modelica.Blocks.Sources.RealExpression HpFlowTemp(y(quantity="Thermics.Temp")=313.15) annotation(Placement(transformation(extent={{150,65},{130,85}})));
-	Modelica.Blocks.Sources.RealExpression SetTempHeatStorage(y(quantity="Thermics.Temp")=308.15) annotation(Placement(transformation(extent={{150,50},{130,70}})));
-	Modelica.Blocks.Sources.BooleanExpression ControlerOn(y=true) annotation(Placement(transformation(extent={{65,60},{85,80}})));
-	GreenCity.Utilities.Thermal.HeatExchanger HeatExchanger(
-		QHeatPrim=QHeatPrim1,
-		QHeatSec=QHeatSec1,
-		cpMedprim=3680,
-		rhoMedprim=1113.1,
-		TAmbient=286.15) annotation(Placement(transformation(extent={{40,-90},{60,-70}})));
-	GreenCity.Utilities.Thermal.MergingValve MergingValveAnlage annotation(Placement(transformation(extent={{5,-90},{25,-70}})));
-	Modelica.Blocks.Math.Sum SumQvGeb(nin=2) annotation(Placement(transformation(extent={{-15,-115},{-35,-95}})));
-	GreenCity.Utilities.Thermal.Pipe PipeAnlageIn(
-		useEnvironmentPort=false,
-		QLossCoefficient=1,
-		lPipe=10,
-		dPipe=0.040,
-		TPipeInit=284.15,
-		rhoMed=1113.1,
-		cpMed=3680) annotation(Placement(transformation(extent={{-35,-10},{-15,0}})));
-	GreenCity.Utilities.Thermal.Pipe PipeAnlageOut(
-		useEnvironmentPort=false,
-		QLossCoefficient=1,
-		lPipe=10,
-		dPipe=0.040,
-		TPipeInit=284.15,
-		rhoMed=1113.1,
-		cpMed=3680) annotation(Placement(transformation(extent={{-15,-55},{-35,-45}})));
-	GreenCity.Utilities.Electrical.PhaseTap PhaseTapGeb annotation(Placement(transformation(
-		origin={250,-165},
-		extent={{-10,-10},{10,10}},
-		rotation=90)));
 	GreenCity.Utilities.Electrical.Grid grid1(
 		OutputType=GreenCity.Utilities.Electrical.Grid.OutputEnum.MasterGrid,
 		useA=true,
@@ -101,73 +299,45 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 		useD=false,
 		useE=true,
 		useF=false) annotation(Placement(transformation(extent={{170,-200},{210,-160}})));
-	GreenCity.Utilities.Electrical.PhaseTap PhaseTapNetwork1 annotation(Placement(transformation(
+	GreenCity.Utilities.Electrical.PhaseTap PhaseTapPumpGeb annotation(Placement(transformation(
+		origin={250,-165},
+		extent={{-10,-10},{10,10}},
+		rotation=90)));
+	GreenCity.Utilities.Electrical.PhaseTap PhaseTapPumpHeat annotation(Placement(transformation(
 		origin={105,-135},
 		extent={{-10,-10},{10,10}},
 		rotation=90)));
-	Modelica.Blocks.Interfaces.RealInput qv_Consumer "'input Real' as connector" annotation(Placement(
-		transformation(extent={{380,-125},{340,-85}}),
-		iconTransformation(extent={{216.7,-170},{176.7,-130}})));
-	Modelica.Blocks.Interfaces.BooleanInput CoolingReq "'input Boolean' as connector" annotation(Placement(
-		transformation(extent={{380.1,-165},{340.1,-125}}),
-		iconTransformation(extent={{216.7,-320},{176.7,-280}})));
-	Modelica.Blocks.Interfaces.RealOutput qv_Network "'output Real' as connector" annotation(Placement(
-		transformation(extent={{-95,-115},{-115,-95}}),
-		iconTransformation(extent={{-190,-160},{-210,-140}})));
-	Modelica.Blocks.Sources.RealExpression TemperaturUnheatedRoom(y(quantity="Thermics.Temp")=286.15) annotation(Placement(transformation(
+	Modelica.Blocks.Sources.RealExpression NoCoolingFlow(y(quantity="Thermics.VolumeFlow")) annotation(Placement(transformation(extent={{320,-165},{300,-145}})));
+	Modelica.Blocks.Sources.RealExpression HpFlowTemp(y(quantity="Thermics.Temp")=TFlowRefSink) annotation(Placement(transformation(extent={{155,65},{135,85}})));
+	Modelica.Blocks.Sources.RealExpression SetTempHeatStorage(y(quantity="Thermics.Temp")=TRefHeatStorage) annotation(Placement(transformation(extent={{155,50},{135,70}})));
+	Modelica.Blocks.Sources.RealExpression TemperaturUnheatedRoom(y(quantity="Thermics.Temp")=TRoomUnheated) annotation(Placement(transformation(
 		origin={260,40},
 		extent={{-10,-10},{10,10}})));
-	Modelica.Blocks.Interfaces.RealInput TGround "'input Real' as connector" annotation(Placement(
-		transformation(
-			origin={-25,60},
-			extent={{-20,-20},{20,20}},
-			rotation=-90),
-		iconTransformation(
-			origin={-100,400},
-			extent={{-20,-20},{20,20}},
-			rotation=-90)));
-	Real COP1 "Current COP of heat pump (HeatPump)";
-	Real QHeatPrim1(
-		quantity="Basics.Power",
-		displayUnit="kW") "Primary Heat Input (HeatExchanger)";
-	Real QHeatSec1(
-		quantity="Basics.Power",
-		displayUnit="kW") "Secondary Heat Output (HeatExchanger)";
-	Real SOC1(
-		quantity="Basics.RelMagnitude",
-		displayUnit="%") "State of charge (HeatStorage)";
+	Modelica.Blocks.Sources.BooleanTable HeatingPeriod(
+		table=timePoints[:],
+		startValue=true) annotation(Placement(transformation(extent={{60,70},{80,90}})));
+	Modelica.Blocks.Math.Sum SumQvGeb(nin=2) annotation(Placement(transformation(extent={{-15,-115},{-35,-95}})));
+	Modelica.Blocks.Logical.Switch SwitchGeb annotation(Placement(transformation(extent={{285,-155},{265,-135}})));
 	equation
-		connect(PipeAnlageIn.TEnvironment,TGround) annotation(
-			Line(
-				points={{-25,0},{-25,5},{-25,60}},
-				color={0,0,127},
-				thickness=0.0625),
-			AutoRoute=false);
-		connect(PipeAnlageOut.TEnvironment,TGround) annotation(
-			Line(
-				points={{-25,-45},{-25,-40},{-25,60}},
-				color={0,0,127},
-				thickness=0.0625),
-			AutoRoute=false);
 		connect(grid1.LVMastGrid,LVGrid) annotation(
 			Line(
 				points={{190,-200},{190,-205},{190,-235}},
 				color={247,148,29},
 				thickness=0.015625),
 			AutoRoute=false);
-		connect(grid1.LVGridA,PhaseTapNetwork1.Grid3) annotation(Line(
+		connect(grid1.LVGridA,PhaseTapPumpHeat.Grid3) annotation(Line(
 			points={{170,-165},{165,-165},{105,-165},{105,-150},{105,-145}},
 			color={247,148,29},
 			thickness=0.015625));
-		connect(grid1.LVGridE,PhaseTapGeb.Grid3) annotation(Line(
+		connect(grid1.LVGridE,PhaseTapPumpGeb.Grid3) annotation(Line(
 			points={{210,-180},{215,-180},{250,-180},{250,-175}},
 			color={247,148,29},
 			thickness=0.015625));
-		connect(PipeAnlageOut.PipeOut,PipeOutNetwork) annotation(Line(
+		connect(MergingValveAnlage.PipeOut,PipeOutNetwork) annotation(Line(
 			points={{-35,-50},{-40,-50},{-95,-50},{-100,-50}},
 			color={190,30,45},
 			thickness=0.0625));
-		connect(PipeAnlageIn.PipeIn,PipeInNetwork) annotation(Line(
+		connect(DistributionValveAnlage.PipeIn,PipeInNetwork) annotation(Line(
 			points={{-35,-5},{-40,-5},{-95,-5},{-100,-5}},
 			color={190,30,45},
 			thickness=0.015625));
@@ -179,10 +349,6 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 			points={{360,-105},{355,-105},{-8,-105},{-13,-105}},
 			color={0,0,127},
 			thickness=0.015625));
-		connect(MergingValveAnlage.PipeOut,PipeAnlageOut.PipeIn) annotation(Line(
-			points={{5,-80},{0,-80},{-10,-80},{-10,-50},{-15,-50}},
-			color={190,30,45},
-			thickness=0.0625));
 		connect(HeatExchanger.PrimaryOutPipe,MergingValveAnlage.PipeIn2) annotation(Line(
 			points={{40,-85},{35,-85},{30,-85},{25,-85}},
 			color={190,30,45},
@@ -191,10 +357,6 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 			points={{25,-10},{30,-10},{35,-10},{35,-75},{40,-75}},
 			color={190,30,45},
 			thickness=0.0625));
-		connect(DistributionValveAnlage.PipeIn,PipeAnlageIn.PipeOut) annotation(Line(
-			points={{5,-5},{0,-5},{-10,-5},{-15,-5}},
-			color={190,30,45},
-			thickness=0.015625));
 		connect(HeatPump.SourcePipeOut,MergingValveAnlage.PipeIn1) annotation(Line(
 			points={{45,-20},{40,-20},{30,-20},{30,-75},{25,-75}},
 			color={190,30,45},
@@ -207,7 +369,7 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 			points={{170,-180},{165,-180},{65,-180},{65,-35},{65,-30}},
 			color={247,148,29},
 			thickness=0.015625));
-		connect(PhaseTapNetwork1.Grid1,PumpHeatStorage.Grid1) annotation(Line(
+		connect(PhaseTapPumpHeat.Grid1,PumpHeatStorage.Grid1) annotation(Line(
 			points={{105,-125},{105,-120},{105,-35},{105,-30}},
 			color={247,148,29},
 			thickness=0.015625));
@@ -220,10 +382,10 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 			color={0,0,127},
 			thickness=0.015625));
 		connect(HeatController.UNITon,HeatPump.HPon) annotation(Line(
-			points={{80,55},{75,55},{55,55},{55,15},{55,10}},
+			points={{50,50}},
 			color={255,0,255},
 			thickness=0.015625));
-		connect(ControlerOn.y,HeatController.Enable) annotation(Line(
+		connect(HeatingPeriod.y,HeatController.Enable) annotation(Line(
 			points={{86,70},{91,70},{91,67.7},{90,67.7},{90,65},{90,
 			60}},
 			color={255,0,255},
@@ -333,7 +495,7 @@ model HeatCoolSupply "HeatCool Supply with Heatpump and Heatexchanger"
 			points={{360,-105},{355,-105},{255,-105},{255,-95},{255,-90}},
 			color={0,0,127},
 			thickness=0.015625));
-		connect(PhaseTapGeb.Grid1,PumpGeb.Grid1) annotation(Line(
+		connect(PhaseTapPumpGeb.Grid1,PumpGeb.Grid1) annotation(Line(
 			points={{250,-155},{250,-150},{250,-65},{250,-70}},
 			color={247,148,29},
 			thickness=0.015625));
