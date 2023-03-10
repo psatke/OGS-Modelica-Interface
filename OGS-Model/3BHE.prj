@@ -309,20 +309,6 @@
             <linear_solver>general_linear_solver</linear_solver>
         </nonlinear_solver>
     </nonlinear_solvers>
-    <!-- <linear_solvers>
-        <linear_solver>
-            <name>general_linear_solver</name>
-            <lis>-i cg -p jacobi -tol 1e-16 -maxiter 10000</lis>
-            <eigen>
-                <solver_type>PardisoLU</solver_type>
-                <scaling>true</scaling>
-            </eigen>
-            <petsc>
-                <prefix>gw</prefix>
-                <parameters>-gw_ksp_type cg -gw_pc_type bjacobi -gw_ksp_rtol 1e-16 -gw_ksp_max_it 10000</parameters>
-            </petsc>
-        </linear_solver>
-    </linear_solvers> -->
     <linear_solvers>
         <linear_solver>
             <name>general_linear_solver</name>
