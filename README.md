@@ -6,12 +6,12 @@
 [![Python](https://img.shields.io/badge/Python-v3.9.12-blue?style=flat&logo=data:image/png;base64,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)](https://www.python.org/downloads/)
 
 
-This interface passes information from an OpenGeoSys (OGS) -Model to a Modelica-Model using the Transmission Control Protocol/Internet Protocol. The Co-simulation is controlled by _ProgrammAndServerControl.py which starts a communication server, SimulationX (client) and OGS (client) as well as handeling the information transfer and saving the results.
+This interface passes information from an OpenGeoSys (OGS) -Model to a Modelica-Model using the Transmission Control Protocol/Internet Protocol. The Co-simulation is controlled by _ProgramAndServerControl.py which starts a communication server, SimulationX (client) and OGS (client) as well as handeling the information transfer and saving the results.
 
 ## Requirements
 
 **Modelica:**
-To successfully run _ProgrammAndServerControl.py without further adaptations SimulationX 4.3 as well as the GreenCity and InterfacesGeneral librarys have to be available. The Modelica model uses some custome componets based on the mentioned librarys that are included (Modelica-Model/CustomeComponents) and custome data (Modelica-Model/Data) that needs to be referenced.
+To successfully run _ProgramAndServerControl.py without further adaptations SimulationX 4.3 as well as the GreenCity and InterfacesGeneral librarys have to be available. The Modelica model uses some custome componets based on the mentioned librarys that are included (Modelica-Model/CustomeComponents) and custome data (Modelica-Model/Data) that needs to be referenced.
 
 **OpenGeoSys:**
 The executable OGS file is already included, therefore no installation is needed.
@@ -30,13 +30,13 @@ Exchange of the OGS model:
   1.        <python_script>PreAndPostTimestep.py</python_script>
   2.        <use_server_communication>true</use_server_communication>
 * changing the number or type of BHE will result in a different number of communication channels in OGS-Model/PreAndPostTimestep.py (Modelica model needs to be modified respectively)
-* the final timestep (`simTimeFinalStep=3600`) and the project name (`OGS_project='3BHE'`) need to be defined in OGS-Model/_ProgrammAndServerConrol.py
-* more complex models will require a longer timeout off the barrier in OGS-Model/_ProgrammAndServerConrol.py
+* the final timestep (`simTimeFinalStep=3600`) and the project name (`OGS_project='3BHE'`) need to be defined in OGS-Model/_ProgramAndServerConrol.py
+* more complex models will require a longer timeout off the barrier in OGS-Model/_ProgramAndServerConrol.py
 
 Exchange of the Modelica model:
 * parameters of the component `InterfacesGeneral.CoSimulation.Coupling` need to match the OGS model
 * additional `GreenCity.Interfaces.Thermal.DefineVolumeFlow` may be required
-* the final timestep (`simTimeFinalStep=3600`) and the project name (`simX_model='Validierung'`) need to be defined in _ProgrammAndServerConrol.py
+* the final timestep (`simTimeFinalStep=3600`) and the project name (`simX_model='Validierung'`) need to be defined in _ProgramAndServerConrol.py
 
 ## Puplications
 ## License
