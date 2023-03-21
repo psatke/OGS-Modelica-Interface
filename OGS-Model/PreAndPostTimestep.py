@@ -18,7 +18,7 @@ typeBHE = "2U"
 if typeBHE == "1U":
     nop = noBHE
 elif typeBHE == "2U":
-    nop = 2*noBHE+1
+    nop = 2*noBHE
 
 
 class BC(OpenGeoSys.BHENetwork):
@@ -31,19 +31,19 @@ class BC(OpenGeoSys.BHENetwork):
         # BHE 2U: len(Tin) = len(Tout) = len(Tout_node_id) = len(flowrate) = numberOfBHE*2
         # BHE 2U: Tin[0] = Input Temperature of first pipe of first BHE
         # BHE 2U: Tin[1] = Input Temperature of second pipe of first BHE
-        return (0, [284.15]*(nop-1), [284.15]*(nop-1), [0]*(nop-1), [0.0]*(nop-1))
+        return (0, [284.15]*(nop), [284.15]*(nop), [0]*(nop), [0.0]*(nop))
     def serverCommunicationPreTimestep(self, t, dt, Tin_val, Tout_val, flowrate):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        headerSend = struct.pack('!IdII', 27, 60.0, nop, 2)
+        headerSend = struct.pack('!IdII', 27, 60.0, (nop+1), 2)
         client.sendall(headerSend)
         client.recv(20)
 
-        dataOGS = struct.pack('!IddI'+nop*'d',
+        dataOGS = struct.pack('!IddI'+(nop+1)*'d',
                               26,
                               t,
                               dt,
-                              nop,
+                              (nop+1),
                               *Tout_val,
                               sum(flowrate))
         client.sendall(dataOGS)
@@ -51,8 +51,8 @@ class BC(OpenGeoSys.BHENetwork):
         dataSimXUn = struct.unpack('!IddI4d', dataSimX)
         client.close()
 
-        flowrate = [dataSimXUn[6]/(nop-1)]*(nop-1)
-        Tin_val = [dataSimXUn[4]]*(nop-1)
+        flowrate = [dataSimXUn[6]/(nop)]*(nop)
+        Tin_val = [dataSimXUn[4]]*(nop)
 
         return (Tin_val, flowrate)
 
@@ -60,15 +60,15 @@ class BC(OpenGeoSys.BHENetwork):
     def serverCommunicationPostTimestep(self, t, dt, Tin_val, Tout_val, flowrate):
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client.connect(ADDR)
-        headerSend = struct.pack('!IdII', 37, 60.0, nop, 2)
+        headerSend = struct.pack('!IdII', 37, 60.0, (nop+1), 2)
         client.sendall(headerSend)
         client.recv(20)
 
-        dataOGS = struct.pack('!IddI'+nop*'d',
+        dataOGS = struct.pack('!IddI'+(nop+1)*'d',
                               36,
                               t,
                               dt,
-                              nop,
+                              (nop+1),
                               *Tout_val,
                               sum(flowrate))
         client.sendall(dataOGS)
