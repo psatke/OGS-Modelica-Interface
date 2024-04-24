@@ -215,8 +215,7 @@ def handleServer() -> None:
         conn, addr = server.accept()
         activeConnList.extend([[conn, addr]])
         clientThread = threading.Thread(target=handleClient, args=(
-            conn, addr), daemon=True)
-        clientThread.setName('Thread [Client ' + str(i) + ']')
+            conn, addr), daemon=True, name='[Client ' + str(i) + ']')
         clientThread.start()
         i += 1
 
@@ -346,8 +345,7 @@ trackingDict = {"currentStepSimX": -1,
 # ______________ Start Calculation ______________
 
 print("[SERVER]\t is starting ...")
-serverThread = threading.Thread(target=handleServer, daemon=True)
-serverThread.setName('Thread [SERVER]')
+serverThread = threading.Thread(target=handleServer, name='[SERVER]', daemon=True)
 serverThread.start()
 
 try:
@@ -357,11 +355,12 @@ except:
 xl_id = pythoncom.CoMarshalInterThreadInterfaceInStream(
     pythoncom.IID_IDispatch, sim)
 simXThread = threading.Thread(
-    target=handleSimulationX, kwargs={'xl_id': xl_id})
-simXThread.setName('Thread [SimX]')
+    target=handleSimulationX, kwargs={'xl_id': xl_id}, name='[MODELICA]')
 simXThread.start()
 
-callOGS = r'OGS-Model\ogs.exe -o OGS-Model\results OGS-Model\{}.prj > OGS-Model\results\result.tec'.format(
+# the OpenGeoSys version only works with python3.10.9
+
+callOGS = r'OGS-Model\ogs_6.5.1.exe -o OGS-Model\results OGS-Model\{}.prj > OGS-Model\results\result.tec'.format(
     OGS_project)
 print('[OGS]\t\t running ...')
 with open(r'{}\OGS-Model\results\out.txt'.format(dir), 'w+') as fout:
