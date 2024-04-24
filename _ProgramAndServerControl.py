@@ -18,6 +18,7 @@ import win32com.client
 import pythoncom
 import subprocess
 import time
+import shutil
 
 # ============== Functions ==============
 
@@ -332,6 +333,11 @@ lSimX = []
 #           [following Timesteps],
 #           ...]
 lOGS = []
+
+dirOgsRes = os.path.join(dir, 'OGS-Model', 'results')
+if os.path.exists(dirOgsRes):
+    shutil.rmtree(dirOgsRes)
+os.mkdir(dirOgsRes)
 
 barrier = threading.Barrier(2, timeout=120.0)
 lock = threading.Lock()
